@@ -1,0 +1,19 @@
+[ React を使った Twitter クローン ]
+
+1 : Express で API サーバーをたてる
+
+	‘‘‘
+	cd express_api
+	node app.js
+	‘‘‘
+
+	これで、localhost:3002 に [ users 一覧・詳細・クッキー追加・クッキー確認・更新・削除 ] ができる APIサーバーがたちました。
+
+2 : React で UI を見れるようにする
+	
+	‘‘‘
+	cd react_ui
+	yarn start
+	‘‘‘
+
+	未実装。
