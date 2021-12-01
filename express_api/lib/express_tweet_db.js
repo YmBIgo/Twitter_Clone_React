@@ -96,6 +96,7 @@ function select_all_user(db, res){
 function select_id_user(db, user_id, res){
 	db.serialize(() => {
 		//
+		console.log(user_id)
 		db.get("SELECT * FROM USERS WHERE id = ?;", user_id, (err, row) => {
 			if (err) {
 				console.log(err)
@@ -104,18 +105,25 @@ function select_id_user(db, user_id, res){
 					"message": err.message
 				})
 			} else {
-				let fixed_row = {
-					"id": row["id"],
-					"firstname": row["firstname"],
-					"lastname": row["lastname"],
-					"email": row["email"],
-					"description": row["description"],
-					"created_at": row["created_at"]
+				if ( row != undefined) {
+					let fixed_row = {
+						"id": row["id"],
+						"firstname": row["firstname"],
+						"lastname": row["lastname"],
+						"email": row["email"],
+						"description": row["description"],
+						"created_at": row["created_at"]
+					}
+					res.status(200).json({
+						"status": "ok",
+						"user": fixed_row
+					})
+				} else {
+					res.status(200).json({
+						"status": "user not found error",
+						"message": "user not found"
+					})
 				}
-				res.status(200).json({
-					"status": "ok",
-					"user": fixed_row
-				})
 			}
 		})
 	})
@@ -134,9 +142,17 @@ function select_cookie_user(db, user_data, res){
 			} else {
 				console.log(row)
 				if (row != undefined){
+					let fixed_row = {
+						"id": row["id"],
+						"firstname": row["firstname"],
+						"lastname": row["lastname"],
+						"email": row["email"],
+						"description": row["description"],
+						"created_at": row["created_at"]
+					}
 					res.status(200).json({
 						"status": "ok",
-						"user": row
+						"user": fixed_row
 					})
 				} else {
 					res.status(200).json({
@@ -328,6 +344,7 @@ function select_all_tweet(db, user_data, res) {
 								let fixed_row = {
 									"id": row["id"],
 									"content": row["content"],
+									"user_id": row["user_id"],
 									"created_at": row["created_at"]
 								}
 								fixed_rows.push(fixed_row)
@@ -365,6 +382,7 @@ function select_id_tweet(db, tweet_id, res){
 					let tweet_data = {
 						"id": row["id"],
 						"content": row["content"],
+						"user_id": row["user_id"],
 						"created_at": row["created_at"]
 					}
 					res.status(200).json({

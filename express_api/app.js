@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require("cors")
 const tweet_db = require("./lib/express_tweet_db")
 
 const cookieParser = require("cookie-parser");
@@ -12,9 +13,20 @@ function md5base64(str){
 	return md5.update(str, 'binary').digest('base64')
 }
 
+const corsOptions = {
+	credentials: true,
+	origin: 'http://localhost:3000',
+	optionsSuccessStatus: 200,
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cors(corsOptions))
+
+var server = app.listen(3002, () => {
+	console.log("App Listening on PORT : " + server.address().port)
+});
 
 app.get("/", (req, res) => {
 	res.status(200).send("Hello World")
@@ -23,21 +35,21 @@ app.get("/", (req, res) => {
 
 // User
 
-app.get("/users", (req, res) => {
+app.get("/users", cors(corsOptions), (req, res) => {
 	tweet_db.select_all_user(db, res);
 })
-app.get("/users/:id", (req, res) => {
+app.get("/users/:id", cors(corsOptions), (req, res) => {
 	let user_id = req.params.id;
 	tweet_db.select_id_user(db, user_id, res)
 })
-app.get("/signed_in_user", (req, res) => {
+app.get("/signed_in_user", cors(corsOptions), (req, res) => {
 	let user_data = {
 		"email": req.cookies["email"],
 		"cookietext": req.cookies["cookietext"]
 	}
 	tweet_db.select_cookie_user(db, user_data, res);
 })
-app.post("/users", (req, res) => {
+app.post("/users", cors(corsOptions), (req, res) => {
 	let firstname = req.body.firstname;
 	let lastname = req.body.lastname;
 	let email = req.body.email;
@@ -65,7 +77,7 @@ app.post("/users", (req, res) => {
 		})
 	}
 });
-app.post("/users/update/:id", (req, res) => {
+app.post("/users/update/:id", cors(corsOptions), (req, res) => {
 	let firstname = req.body.firstname;
 	let lastname = req.body.lastname;
 	let description = req.body.description;
@@ -86,7 +98,7 @@ app.post("/users/update/:id", (req, res) => {
 		})
 	}
 });
-app.post("/users/password_update/:id", (req, res) => {
+app.post("/users/password_update/:id", cors(corsOptions), (req, res) => {
 	//
 	let password = req.body.password;
 	let new_password = req.body.newpassword;
@@ -107,7 +119,7 @@ app.post("/users/password_update/:id", (req, res) => {
 		})
 	}
 })
-app.post("/users/sign_in", (req, res) => {
+app.post("/users/sign_in", cors(corsOptions), (req, res) => {
 	//
 	let password = req.body.password;
 	let email = req.body.email;
@@ -120,7 +132,7 @@ app.post("/users/sign_in", (req, res) => {
 	}
 })
 // delete を post にしている。
-app.post("/users/delete/:id", (req, res) => {
+app.post("/users/delete/:id", cors(corsOptions), (req, res) => {
 	//
 	let password = req.body.password;
 	let user_id = req.params.id;
@@ -134,18 +146,18 @@ app.post("/users/delete/:id", (req, res) => {
 })
 
 // Tweet
-app.get("/tweets", (req, res) => {
+app.get("/tweets", cors(corsOptions), (req, res) => {
 	let user_data = {
 		"email": req.cookies["email"],
 		"cookietext": req.cookies["cookietext"]
 	}
 	tweet_db.select_all_tweet(db, user_data, res)
 })
-app.get("/tweets/:id", (req, res) => {
+app.get("/tweets/:id", cors(corsOptions), (req, res) => {
 	let tweet_id = req.params.id
 	tweet_db.select_id_tweet(db, tweet_id, res)
 })
-app.post("/tweets", (req, res) => {
+app.post("/tweets", cors(corsOptions), (req, res) => {
 	let user_data = {
 		"email": req.cookies["email"],
 		"cookietext": req.cookies["cookietext"]
@@ -155,7 +167,7 @@ app.post("/tweets", (req, res) => {
 	}
 	tweet_db.create_tweet(db, tweet_data, user_data, res)
 })
-app.post("/tweets/delete/:id", (req, res) => {
+app.post("/tweets/delete/:id", cors(corsOptions), (req, res) => {
 	let user_data = {
 		"email": req.cookies["email"],
 		"cookietext": req.cookies["cookietext"]
@@ -164,8 +176,4 @@ app.post("/tweets/delete/:id", (req, res) => {
 	let tweet_data = {"id": tweet_id}
 	tweet_db.delete_tweet(db, tweet_data, user_data, res)
 })
-
-var server = app.listen(3002, () => {
-	console.log("App Listening on port " + server.address().port)
-});
 

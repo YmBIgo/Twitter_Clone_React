@@ -1,0 +1,11 @@
+.users-info-card{
+	border:.5px solid rgba(100, 100, 100, .95);
+	padding:7px;
+	width:500px;
+}
+.user-info-title-email{
+	margin-left:10px;
+}
+.user-info-content{
+	
+}

@@ -1,0 +1,13 @@
+.tweetcard{
+	border:0.5px solid rgba(100, 100, 100, .7);
+	padding:7px;
+	margin-left:30px;
+	color:rgba(100, 100, 100, .95);
+	width:500px;
+}
+.tweetcard-title{
+	margin-left:20px;
+}
+.tweetcard-content{
+	margin-left:40px;
+}
