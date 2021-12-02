@@ -1,4 +1,5 @@
 .users-info-card{
+	margin-left:30px;
 	border:.5px solid rgba(100, 100, 100, .95);
 	padding:7px;
 	width:500px;
@@ -7,5 +8,5 @@
 	margin-left:10px;
 }
 .user-info-content{
-	
+
 }

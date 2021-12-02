@@ -11,3 +11,7 @@
 .tweetcard-content{
 	margin-left:40px;
 }
+.tweet-textarea{
+	width:350px;
+	margin:10px 0;
+}

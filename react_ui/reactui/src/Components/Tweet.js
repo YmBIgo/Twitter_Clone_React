@@ -35,7 +35,12 @@ const Tweet = () => {
 				url: signed_in_user_api_url,
 				withCredentials: true
 			}).then((response) => {
-				setCurrentUser(response["data"]["user"])
+				// 書き方が渋い
+				if ( response["data"]["user"] != undefined ){
+					setCurrentUser(response["data"]["user"])
+				} else {
+					setCurrentUser({"id":0})
+				}
 				console.log(response["data"]["user"])
 			})
 		})
@@ -66,7 +71,7 @@ const Tweet = () => {
 				<div className="tweetcard-content">
 					{tweet.content}
 					<br />
-					{ currentUser["id"] == tweet["user_id"] &&
+					{currentUser["id"] == tweet["user_id"] &&
 						<button className="btn btn-sm btn-danger" onClick={delete_tweet}>ツイートを削除する</button>
 					}
 				</div>

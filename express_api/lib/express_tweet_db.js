@@ -400,6 +400,33 @@ function select_id_tweet(db, tweet_id, res){
 	})
 }
 
+function select_user_tweets(db, user_id, res){
+	db.all("SELECT * FROM TWEETS WHERE user_id = ?", user_id, (err, rows) => {
+		if (err) {
+			console.log(err)
+			res.status(400).json({
+				"status": "error",
+				"message": err.message
+			})
+		} else {
+			let fixed_rows = []
+			rows.forEach(function(row){
+				fixed_row = {
+					"id": row["id"],
+					"content": row["content"],
+					"user_id": row["user_id"],
+					"created_at": row["created_at"]
+				}
+				fixed_rows.push(fixed_row)
+			})
+			res.status(200).json({
+				"status": "ok",
+				"tweets": fixed_rows
+			})
+		}
+	})
+}
+
 function create_tweet(db, tweet_data, user_data, res){
 	// cookie 認証必要
 	db.serialize(() => {
@@ -513,6 +540,7 @@ module.exports.update_user_normal_data = update_user_normal_data;
 module.exports.update_user_password_data = update_user_password_data;
 module.exports.update_user_cookie_data = update_user_cookie_data;
 module.exports.delete_user = delete_user;
+module.exports.select_user_tweets = select_user_tweets;
 module.exports.select_all_tweet = select_all_tweet;
 module.exports.select_id_tweet = select_id_tweet
 module.exports.create_tweet = create_tweet;

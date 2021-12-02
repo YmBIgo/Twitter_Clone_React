@@ -176,4 +176,8 @@ app.post("/tweets/delete/:id", cors(corsOptions), (req, res) => {
 	let tweet_data = {"id": tweet_id}
 	tweet_db.delete_tweet(db, tweet_data, user_data, res)
 })
+app.get("/users/:id/tweets", cors(corsOptions), (req, res) => {
+	let user_id = req.params.id
+	tweet_db.select_user_tweets(db, user_id, res)
+})
 
