@@ -9,7 +9,6 @@ const TweetNew = () => {
 	const useeffect_counter = 0
 
 	useEffect(() => {
-		//
 		checkUserSignedIn()
 	}, [useeffect_counter]);
 

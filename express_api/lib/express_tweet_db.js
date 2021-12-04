@@ -219,6 +219,43 @@ function update_user_normal_data(db, user_data, user_id, res) {
 	})
 }
 
+function update_user_image_data(db, user_data, user_id, res){
+	db.serialize(() => {
+		db.get("SELECT * FROM USERS WHERE id = ? AND email = ? AND cookietext = ?;", user_id, user_data["email"], user_data["cookietext"], (err, row) => {
+			if (err) {
+				console.log(err)
+			} else {
+				if (row != undefined) {
+					const update_user_state_normal = db.prepare("UPDATE USERS SET avatar_image_url = ? WHERE id = ? AND cookietext = ?;")
+					update_user_state_normal.run(user_data["image_url"], row["id"], user_data["cookietext"], (err, result) => {
+						if (err) {
+							console.log(err)
+							res.status(400).json({
+								"status": "error",
+								"message": err.message
+							})
+						} else {
+							console.log(update_user_state_normal.changes)
+							// res.status(200).json({
+							// 	"status": "ok",
+							// 	"changes": update_user_state_normal.changes
+							// })
+							// すごい渋い ...
+							res.redirect("http://localhost:3000/users/" + user_id)
+						}
+					})
+				} else {
+					console.log("user authentification failed")
+					res.status(200).json({
+						"status": "authentification error",
+						"message": "user authentification failed"
+					})
+				}
+			}
+		})
+	})
+}
+
 function update_user_password_data(db, user_data, new_user_data, user_id, res){
 	const update_user_state_confidential = db.prepare("UPDATE USERS SET password = ? WHERE email = ? AND password = ? AND id = ?;");
 	update_user_state_confidential.run(new_user_data["password"], user_data["email"], user_data["password"], user_id, (err, result) => {
@@ -537,6 +574,7 @@ module.exports.select_id_user = select_id_user;
 module.exports.select_cookie_user = select_cookie_user;
 module.exports.create_user = create_user;
 module.exports.update_user_normal_data = update_user_normal_data;
+module.exports.update_user_image_data = update_user_image_data;
 module.exports.update_user_password_data = update_user_password_data;
 module.exports.update_user_cookie_data = update_user_cookie_data;
 module.exports.delete_user = delete_user;

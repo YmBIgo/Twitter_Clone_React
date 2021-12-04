@@ -1,3 +1,5 @@
 react_ui/reactui/node_modules
 express_api/db
 express_api/node_modules
+express_api/auth_file
+express_api/temp_file

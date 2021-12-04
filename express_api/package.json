@@ -9,11 +9,15 @@
   "author": "coffeecupjp",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/storage": "^5.16.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "express": "^4.17.1",
+    "fs": "^0.0.1-security",
     "iconv-lite": "^0.4.23",
+    "multer": "^1.4.3",
+    "path": "^0.12.7",
     "sqlite3": "^5.0.2"
   }
 }

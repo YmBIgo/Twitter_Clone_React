@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Link, Routes, Route } from 'react-router-dom';
 import Users from "./Components/Users"
 import User from "./Components/User"
+import UserEdit from "./Components/UserEdit"
 import Tweets from "./Components/Tweets"
 import Tweet from "./Components/Tweet"
 import TweetNew from "./Components/TweetNew"
@@ -13,8 +14,10 @@ function App() {
       <div className="app">
         <Header />
         <Routes>
+          <Route exact path="/" element={ <Tweets/> } />
           <Route exact path="/users" element={ <Users/> } />
           <Route exact path="/users/:id" element={ <User/> } />
+          <Route exact path="/users/edit" element={ <UserEdit/> } />
           <Route exact path="/tweets" element={ <Tweets/> } />
           <Route exact path="/tweets/:id" element={ <Tweet/> } />
           <Route exact path="/tweets/new" element={ <TweetNew/> } />

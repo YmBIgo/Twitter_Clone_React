@@ -1,7 +1,10 @@
 const express = require("express");
 const app = express();
 const cors = require("cors")
-const tweet_db = require("./lib/express_tweet_db")
+const tweet_db = require("./lib/express_tweet_db");
+const fs = require("fs");
+const multer = require("multer");
+const google_cs = require("./lib/gcp_cloud_storage")
 
 const cookieParser = require("cookie-parser");
 const crypto = require("crypto")
@@ -19,6 +22,8 @@ const corsOptions = {
 	optionsSuccessStatus: 200,
 }
 
+const uploader = multer({ dest: './temp_file/' })
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -28,10 +33,11 @@ var server = app.listen(3002, () => {
 	console.log("App Listening on PORT : " + server.address().port)
 });
 
+// 
+
 app.get("/", (req, res) => {
 	res.status(200).send("Hello World")
 });
-
 
 // User
 
@@ -77,11 +83,13 @@ app.post("/users", cors(corsOptions), (req, res) => {
 		})
 	}
 });
-app.post("/users/update/:id", cors(corsOptions), (req, res) => {
+app.post("/users/update/:id", uploader.single('avatar'), (req, res) => {
+	// , uploader.single('avatar')
 	let firstname = req.body.firstname;
 	let lastname = req.body.lastname;
 	let description = req.body.description;
 	let id = req.params.id
+	//
 	if ( firstname != undefined && lastname != undefined && description != undefined && id != undefined) {
 		let user_data = {
 			"firstname": firstname,
@@ -98,6 +106,29 @@ app.post("/users/update/:id", cors(corsOptions), (req, res) => {
 		})
 	}
 });
+app.post("/users/upload_image/:id", uploader.single("avatar"), (req, res) => {
+	let id = req.params.id
+	let img_path = req.file
+	let gcp_img_url = "";
+	// 認証する必要あるけど ...
+	if ( img_path ) {
+		// console.log(req.file.path, req.file.originalname)
+		let file_name = id + "/" + req.file.path.split("/")[1]
+		google_cs.upload_file(req.file.path, file_name)
+		gcp_img_url = "https://storage.googleapis.com/tweet_storage_0218/" + file_name
+		let user_data = {
+			"image_url": gcp_img_url,
+			"email": req.cookies["email"],
+			"cookietext": req.cookies["cookietext"]
+		}
+		tweet_db.update_user_image_data(db, user_data, id, res)
+	} else {
+		res.status(200).json({
+			"status": "error",
+			"message": "file not uploaded."
+		})
+	}
+})
 app.post("/users/password_update/:id", cors(corsOptions), (req, res) => {
 	//
 	let password = req.body.password;

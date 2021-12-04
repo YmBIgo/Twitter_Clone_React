@@ -31,7 +31,7 @@
 		</div>
 		<div class="col-6">
 			<h3>User update</h3>
-			<form action="http://localhost:3002/users/update/1" method="POST">
+			<form action="http://localhost:3002/users/update/3" method="POST">
 				<label>Last Name</label>
 				<input type="text" name="lastname">
 				<br>
@@ -41,7 +41,16 @@
 				<label>Description</label>
 				<input type="text" name="description">
 				<br>
-				<input type="hidden" name="id" value="7">
+				<input type="hidden" name="id" value="3">
+				<button>Send</button>
+			</form>
+		</div>
+		<div class="col-6">
+			<h3>User Image Upload</h3>
+			<form action="http://localhost:3002/users/upload_image/3" method="POST" enctype="multipart/form-data">
+				<label>Image</label>
+				<input type="file" name="avatar" accept="image/*">
+				<br>
 				<button>Send</button>
 			</form>
 		</div>
