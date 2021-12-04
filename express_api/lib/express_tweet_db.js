@@ -81,6 +81,7 @@ function select_all_user(db, res){
 						"lastname": item["lastname"],
 						"email": item["email"],
 						"description": item["description"],
+						"avatar_image_url": item["avatar_image_url"],
 						"created_at": item["created_at"]
 					})
 				})
@@ -112,6 +113,7 @@ function select_id_user(db, user_id, res){
 						"lastname": row["lastname"],
 						"email": row["email"],
 						"description": row["description"],
+						"avatar_image_url": row["avatar_image_url"],
 						"created_at": row["created_at"]
 					}
 					res.status(200).json({
@@ -148,6 +150,7 @@ function select_cookie_user(db, user_data, res){
 						"lastname": row["lastname"],
 						"email": row["email"],
 						"description": row["description"],
+						"avatar_image_url": row["avatar_image_url"],
 						"created_at": row["created_at"]
 					}
 					res.status(200).json({

@@ -8,5 +8,11 @@
 	margin-left:10px;
 }
 .user-info-content{
-
+	margin-bottom:10px;
+}
+.user-avatar-img{
+	width:30px;
+	height:30px;
+	border-radius:180%;
+	margin-right:10px;
 }

@@ -6,6 +6,7 @@ import "./CSS/Tweets.css"
 const TweetNew = () => {
 
 	const [userSignedIn, setUserSignedIn] = useState(0);
+	const [currentuser, setCurrentuser] = useState({}); 
 	const useeffect_counter = 0
 
 	useEffect(() => {
@@ -22,6 +23,7 @@ const TweetNew = () => {
 				setUserSignedIn(0)
 			} else {
 				setUserSignedIn(1)
+				setCurrentuser(response["data"]["user"]);
 			}
 			console.log(response)
 		})
@@ -77,9 +79,16 @@ const TweetNew = () => {
 			}
 			{ userSignedIn == 1 &&
 				<div>
-					<Link to="/tweets">ツイート一覧</Link>
+					<Link to="/tweets">
+						ツイート一覧
+					</Link>
 					<div className="tweetcard">
-						<h4>ツイート作成</h4>
+						<h4>
+							<Link to={"/users/"+currentuser["id"]}>
+								<img src={currentuser["avatar_image_url"]} className="user-avatar-img" />
+							</Link>
+							ツイート作成
+						</h4>
 						<div>
 							<textarea className="tweet-textarea form-control" name="tweet"></textarea>
 							<button className="btn btn-info" onClick={createTweet}>Send</button>

@@ -75,28 +75,37 @@ const Tweets = () => {
 					<div>
 						{tweets.map((tweet, index) => {
 							let user_name = "";
+							let user_avatar_img = "";
 							let user_show_url = "http://localhost:3002/users/" + tweet.user_id
 							axios({
 								method: "GET",
 								url: user_show_url,
 								withCredentials: true
 							}).then((response) => {
-								user_name = response["data"]["user"]["lastname"] + " " + response["data"]["user"]["firstname"]
-								console.log(user_name, index)
+								user_name = response["data"]["user"]["lastname"] + " " + response["data"]["user"]["firstname"];
+								user_avatar_img = response["data"]["user"]["avatar_image_url"];
+								// console.log(user_name, index);
+								if (user_avatar_img == "") {
+									user_avatar_img = "https://storage.googleapis.com/tweet_storage_0218/default/twitter.png";
+								}
+								document.getElementsByClassName("user-avatar-img")[index].setAttribute("src", user_avatar_img);
 								document.getElementsByClassName("tweets-username")[index].innerText = user_name;
 							})
 							let tweet_show_url = "/tweets/" + tweet.id
 							return(
-								<Link to={tweet_show_url}>
-									<div className="tweetcard">
-										<div className="tweetcard-title">
-											{tweet.id} <span className="tweets-username">{user_name}</span>
-										</div>
-										<div className="tweetcard-content">
-											{tweet.content}
-										</div>
+								<div className="tweetcard">
+									<div className="tweetcard-title">
+										<img className="user-avatar-img" />
+										<Link to={"/users/"+tweet.user_id} className="tweet-user-name">
+											<span className="tweets-username">{user_name}</span>
+										</Link>
 									</div>
-								</Link>
+									<div className="tweetcard-content">
+										<Link to={tweet_show_url}>
+											{tweet.content}
+										</Link>
+									</div>
+								</div>
 							)
 						})}
 					</div>

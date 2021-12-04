@@ -114,10 +114,10 @@ const UserEdit = () => {
 					<div className="users-info-card">
 						<h4>ユーザーを編集する</h4>
 						<label>Last Name</label>
-						<input className="lastname-input" type="text" name="lastname" onChange={changedInput} value={lastname} />
+						<input className="lastname-input form-control" type="text" name="lastname" onChange={changedInput} value={lastname} />
 						<br />
 						<label>First Name</label>
-						<input className="firstname-input" type="text" name="firstname" onChange={changedInput} value={firstname} />
+						<input className="firstname-input form-control" type="text" name="firstname" onChange={changedInput} value={firstname} />
 						<br />
 						<label>Description</label>
 						<textarea className="description-input form-control" name="description" onChange={changedInput} value={description}></textarea>

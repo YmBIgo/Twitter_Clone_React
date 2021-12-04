@@ -28,6 +28,12 @@ const Users = () => {
 				return (
 					<div className="users-info-card">
 						<div className="user-info-title">
+							{ user["avatar_image_url"] == "" &&
+								<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img" />
+							}
+							{ user["avatar_image_url"] != "" &&
+								<img src={user["avatar_image_url"]} className="user-avatar-img" />
+							}
 							<Link to={'/users/'+user.id}>
 								{user.lastname} {user.firstname} 
 							</Link>
