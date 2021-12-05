@@ -570,8 +570,200 @@ function get_tweets_from_user_id(db, user_id){
 	})
 }
 
+function create_user_follow_relation(db, user_id, user_data, res){
+	db.serialize(() => {
+		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, user_row) => {
+			if (err) {
+				console.log(err)
+				res.status(400).json({
+					"status": "error",
+					"message": err.message
+				})
+			} else if (user_row == undefined) {
+				console.log("User not login.")
+				res.status(200).json({
+					"status": "authentification error",
+					"message": "user authentification failed"
+				})
+			} else if (user_id == user_row["id"]){
+				console.log("User cannot follow identical user.")
+				res.status(200).json({
+					"status": "user identical error",
+					"message": "follow user is identical..."
+				})
+			} else {
+				db.get("SELECT * FROM USER_FOLLOW_RELATIONS WHERE from_user_id = ? AND to_user_id = ?;", user_row["id"], user_id, (err, ufr_row) => {
+					if (err) {
+						console.log(err)
+						res.status(400).json({
+							"status": "error",
+							"message": err.message
+						})
+					} else {
+						if (ufr_row != undefined) {
+							res.status(200).json({
+								"status": "follow exists error",
+								"message": "follow already exists."
+							})
+						} else {
+							let create_user_follow_state = db.prepare("INSERT INTO USER_FOLLOW_RELATIONS(to_user_id, from_user_id) VALUES(?, ?);")
+							create_user_follow_state.run(user_id, user_row["id"], (err, result) => {
+								if (err){
+									console.log(err)
+									res.status(400).json({
+										"status": "error",
+										"message": err.message
+									})
+								} else {
+									console.log(create_user_follow_state.lastID)
+									res.status(200).json({
+										"status": "ok",
+										"lastID": create_user_follow_state.lastID
+									})
+								}
+							})
+						}
+					}
+				})
+			}
+		})
+	})
+}
+
+function remove_user_follow_relation(db, user_id, user_data, res){
+	db.serialize(() => {
+		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, user_row) => {
+			if (err) {
+				console.log(err)
+				res.status(400).json({
+					"status": "error",
+					"message": err.message
+				})
+			} else {
+				if (user_row == undefined) {
+					res.status(200).json({
+						"status": "authentification error",
+						"message": "user authentification failed"
+					})
+				} else {
+					let delete_user_follow_state = db.prepare("DELETE FROM USER_FOLLOW_RELATIONS WHERE to_user_id = ? AND from_user_id = ?;")
+					delete_user_follow_state.run(user_id, user_row["id"], (err, result) => {
+						if (err) {
+							res.status(400).json({
+								"status": "error",
+								"message": err.message
+							})
+						} else {
+							console.log(delete_user_follow_state.changes)
+							res.status(400).json({
+								"status": "ok",
+								"changes": delete_user_follow_state.changes
+							})
+						}
+					})
+				}
+			}
+		})
+	})
+}
+
+function select_to_user_follow_by_user_id(db, user_id, res){
+	db.serialize(() => {
+		db.all("SELECT * FROM USER_FOLLOW_RELATIONS WHERE to_user_id = ?", user_id, (err, rows) => {
+			if (err) {
+				res.statu(400).json({
+					"status": "error",
+					"message": err
+				})
+			} else {
+				let id_rows = ""
+				rows.forEach(function(row){
+					id_rows += row["from_user_id"] + ","
+				})
+				id_rows = id_rows.slice(0, id_rows.length-1)
+				let select_all_user_state = "SELECT * FROM USERS WHERE id in (" + id_rows + ");"
+				db.all(select_all_user_state, (err, user_rows) => {
+					if (err) {
+						console.log(err)
+						res.statu(400).json({
+							"status": "error",
+							"message": err
+						})
+					} else {
+						let fixed_user_rows = []
+						user_rows.forEach(function(user_row){
+							let fixed_user_row = {
+								"id": user_row["id"],
+								"lastname": user_row["lastname"],
+								"firstname": user_row["firstname"],
+								"email": user_row["email"],
+								"description": user_row["description"],
+								"avatar_image_url": user_row["avatar_image_url"],
+								"created_at": user_row["created_at"]
+							}
+							fixed_user_rows.push(fixed_user_row)
+						})
+						res.status(200).json({
+							"status": "ok",
+							"users": fixed_user_rows
+						})
+					}
+				})
+			}
+		})
+	})
+}
+
+function select_from_user_follow_by_user_id(db, user_id, res){
+	db.serialize(() => {
+		db.all("SELECT * FROM USER_FOLLOW_RELATIONS WHERE from_user_id = ?", user_id, (err, rows) => {
+			if (err) {
+				res.statu(400).json({
+					"status": "error",
+					"message": err
+				})
+			} else {
+				let id_rows = ""
+				rows.forEach(function(row){
+					id_rows += row["to_user_id"] + ","
+				});
+				id_rows = id_rows.slice(0, id_rows.length-1)
+				let select_all_user_state = "SELECT * FROM USERS WHERE id in (" + id_rows + ");"
+				db.all(select_all_user_state, (err, user_rows) => {
+					if (err) {
+						console.log(err)
+						res.statu(400).json({
+							"status": "error",
+							"message": err
+						})
+					} else {
+						let fixed_user_rows = []
+						user_rows.forEach(function(user_row){
+							let fixed_user_row = {
+								"id": user_row["id"],
+								"lastname": user_row["lastname"],
+								"firstname": user_row["firstname"],
+								"email": user_row["email"],
+								"description": user_row["description"],
+								"avatar_image_url": user_row["avatar_image_url"],
+								"created_at": user_row["created_at"]
+							}
+							fixed_user_rows.push(fixed_user_row)
+						})
+						res.status(200).json({
+							"status": "ok",
+							"users": fixed_user_rows
+						})
+					}
+				})
+			}
+		})
+	})
+}
+
 module.exports.initialize_db = initialize_db;
 module.exports.md5base64 = md5base64;
+// users
 module.exports.select_all_user = select_all_user;
 module.exports.select_id_user = select_id_user;
 module.exports.select_cookie_user = select_cookie_user;
@@ -582,9 +774,14 @@ module.exports.update_user_password_data = update_user_password_data;
 module.exports.update_user_cookie_data = update_user_cookie_data;
 module.exports.delete_user = delete_user;
 module.exports.select_user_tweets = select_user_tweets;
+// tweets
 module.exports.select_all_tweet = select_all_tweet;
 module.exports.select_id_tweet = select_id_tweet
 module.exports.create_tweet = create_tweet;
 module.exports.delete_tweet = delete_tweet;
 module.exports.get_tweets_from_user_id = get_tweets_from_user_id;
-
+// user_follow_relations
+module.exports.create_user_follow_relation = create_user_follow_relation;
+module.exports.remove_user_follow_relation = remove_user_follow_relation;
+module.exports.select_to_user_follow_by_user_id = select_to_user_follow_by_user_id;
+module.exports.select_from_user_follow_by_user_id = select_from_user_follow_by_user_id;

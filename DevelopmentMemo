@@ -1,13 +1,26 @@
 開発で分からなかった部分
 
 ・if 文 の ネスト
+	@ /react_ui/reactui/src/Tweet.js
 	" { hoge && " を複数並べられない
 	const hoge = () => 以下に if を並べても、axios の後の動作が反映されない。
+
 ・DB テーブル の追加
+	@ /express_api/lib/db_table
 	本体のテーブルを更新するのに、どのように管理する方がいいか？
+
 ・Cookie 
 	ログインするたびに cookie 更新しているのを、ログイン時に cookie だけ配布することはできないか？
-・画像アップロード
+
+・画像アップロード①
+	@ /express_api/app.js の "/users/upload_image/:id"部分
 	/users/update_image/:id で ユーザー認証しないで、画像アップロードさせている。
+
+・画像アップロード②
+	@ /express_api/lib/express_tweet_db.js の function update_user_image_data 部分
+	res.redirect() は APIとしては辛い。
+	input[file] がどのように send されるか知りたい。
+
 ・更新時の入力フォーム
+	@ /react_ui/reactui/src/UserEdit.js
 	value={hoge} をしている場合に、hoge で 一々 setState をしている。もっと短く書ける方法はないか？

@@ -212,3 +212,29 @@ app.get("/users/:id/tweets", cors(corsOptions), (req, res) => {
 	tweet_db.select_user_tweets(db, user_id, res)
 })
 
+// User follow relations
+app.post("/follow/:id", cors(corsOptions), (req, res) => {
+	let user_data = {
+		"email": req.cookies["email"],
+		"cookietext": req.cookies["cookietext"]
+	}
+	let user_id = req.params.id;
+	tweet_db.create_user_follow_relation(db, user_id, user_data, res);
+})
+app.post("/unfollow/:id", cors(corsOptions), (req, res) => {
+	let user_data = {
+		"email": req.cookies["email"],
+		"cookietext": req.cookies["cookietext"]
+	}
+	let user_id = req.params.id;
+	tweet_db.remove_user_follow_relation(db, user_id, user_data, res);
+})
+app.get("/users/:id/follow", cors(corsOptions), (req, res) => {
+	let user_id = req.params.id;
+	tweet_db.select_to_user_follow_by_user_id(db, user_id, res)
+})
+app.get("/users/:id/following", cors(corsOptions), (req, res) => {
+	let user_id = req.params.id;
+	tweet_db.select_from_user_follow_by_user_id(db, user_id, res)
+})
+
