@@ -4,6 +4,7 @@ import { BrowserRouter, Link, Routes, Route } from 'react-router-dom';
 import Users from "./Components/Users"
 import User from "./Components/User"
 import UserEdit from "./Components/UserEdit"
+import UserCreate from "./Components/UserCreate"
 import Tweets from "./Components/Tweets"
 import Tweet from "./Components/Tweet"
 import TweetNew from "./Components/TweetNew"
@@ -20,6 +21,7 @@ function App() {
           <Route exact path="/users" element={ <Users/> } />
           <Route exact path="/users/:id" element={ <User/> } />
           <Route exact path="/users/edit" element={ <UserEdit/> } />
+          <Route exact path="/users/new" element={ <UserCreate/> } />
           <Route exact path="/tweets" element={ <Tweets/> } />
           <Route exact path="/tweets/:id" element={ <Tweet/> } />
           <Route exact path="/tweets/new" element={ <TweetNew/> } />

@@ -37,6 +37,11 @@ const Follow = () => {
 			<Link to={"/users/"+user.id} className="btn">{user.lastname} {user.firstname}の情報に戻る</Link>
 			<h4>{user.lastname} {user.firstname} のFollow一覧</h4>
 			<br />
+			{follows.length == 0 &&
+				<div>
+					<p>フォローされていません。</p>
+				</div>
+			}
 			{follows.map((follow) => {
 				return(
 					<div className="users-info-card">

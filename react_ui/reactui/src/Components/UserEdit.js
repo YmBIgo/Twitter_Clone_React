@@ -75,7 +75,7 @@ const UserEdit = () => {
 			withCredentials: true
 		}).then((response) => {
 			console.log(response)
-			// window.location.assign("http://localhost:3000/users/" + user["id"])
+			window.location.assign("http://localhost:3000/users/" + user["id"])
 		})
 	}
 

@@ -61,7 +61,7 @@ app.post("/users", cors(corsOptions), (req, res) => {
 	let email = req.body.email;
 	let password_original = req.body.password;
 	// Email や Password の 正規表現 ...
-	if ( firstname != undefined && lastname != undefined && email != undefined && password_original != undefined ){
+	if ( firstname != "" && lastname != "" && email != "" && password_original != "" ){
 		let password = md5base64(password_original);
 		let cookie_original = crypto.randomBytes(8).toString("base64");
 		let cookietext = md5base64(cookie_original);

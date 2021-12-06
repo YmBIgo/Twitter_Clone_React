@@ -46,6 +46,14 @@ const Tweets = () => {
 		}).then((response) => {
 			if ( response["data"]["changes"] == 1 ) {
 				setUserSignedIn(1)
+				axios({
+					method:"GET",
+					url: "http://localhost:3002/tweets",
+					withCredentials: true
+				}).then((response2) => {
+					console.log(response2)
+					setTweets(response2["data"]["tweets"])
+				})
 			}
 		})
 	}
@@ -66,6 +74,10 @@ const Tweets = () => {
 					</div>
 					<div>
 						<button onClick={userLogin}>Send</button>
+					</div>
+					<br />
+					<div>
+						<Link to="/users/new">サインアップする</Link>
 					</div>
 				</div>
 			}

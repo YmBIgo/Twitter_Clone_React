@@ -75,6 +75,10 @@ const TweetNew = () => {
 					<div>
 						<button onClick={userLogin}>Send</button>
 					</div>
+					<br />
+					<div>
+						<Link to="/users/new">サインアップする</Link>
+					</div>
 				</div>
 			}
 			{ userSignedIn == 1 &&
