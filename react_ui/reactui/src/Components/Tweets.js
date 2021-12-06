@@ -71,7 +71,7 @@ const Tweets = () => {
 			}
 			{ userSignedIn == 1 &&
 				<div>
-					<h4>ツイート一覧</h4>
+					<h4>ツイートタイムライン</h4>
 					<div>
 						{tweets.map((tweet, index) => {
 							let user_name = "";

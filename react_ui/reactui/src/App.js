@@ -36,7 +36,7 @@ const Header = () => {
     <nav>
       <ul className="tweet-nav">
         <li className="tweet-nav-link">
-          <Link to="/tweets">ツイート一覧</Link>
+          <Link to="/tweets">ツイートタイムライン</Link>
         </li>
         <li className="tweet-nav-link">
           <Link to="/users">ユーザー一覧</Link>

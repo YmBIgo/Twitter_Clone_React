@@ -370,31 +370,75 @@ function select_all_tweet(db, user_data, res) {
 				console.log(err)
 			} else {
 				if (row != undefined){
-					db.all("SELECT * FROM TWEETS;", (err, rows) => {
+					db.all("SELECT * FROM USER_FOLLOW_RELATIONS WHERE from_user_id = ?", row["id"], (err, ufr_rows) => {
+						console.log(ufr_rows)
 						if (err) {
 							console.log(err)
 							res.status(400).json({
 								"status": "error",
 								"message": err.message
 							})
-						} else {
-							console.log(rows)
-							let fixed_rows = []
-							rows.forEach(function(row){
-								let fixed_row = {
-									"id": row["id"],
-									"content": row["content"],
-									"user_id": row["user_id"],
-									"created_at": row["created_at"]
+						} else if (ufr_rows == undefined) {
+							db.all("SELECT * FROM TWEETS WHERE user_id = ?;", row["id"], (err, rows) => {
+								if (err) {
+									console.log(err)
+									res.status(400).json({
+										"status": "error",
+										"message": err.message
+									})
+								} else {
+									console.log(rows)
+									let fixed_rows = []
+									rows.forEach(function(t_row){
+										let fixed_row = {
+											"id": t_row["id"],
+											"content": t_row["content"],
+											"user_id": t_row["user_id"],
+											"created_at": t_row["created_at"]
+										}
+										fixed_rows.push(fixed_row)
+									})
+									res.status(200).json({
+										"status": "ok",
+										"tweets": fixed_rows
+									})
 								}
-								fixed_rows.push(fixed_row)
+							});
+						} else if (ufr_rows != undefined) {
+							let sql_where_ufr_id = row["id"] + ","
+							ufr_rows.forEach(function(ufr_row){
+								sql_where_ufr_id += ufr_row["to_user_id"] + ","
 							})
-							res.status(200).json({
-								"status": "ok",
-								"tweets": fixed_rows
+							sql_where_ufr_id = sql_where_ufr_id.slice(0, sql_where_ufr_id.length-1)
+							let select_tweets_where_ufr_state = "SELECT * FROM TWEETS WHERE user_id in (" + sql_where_ufr_id + ")"
+							console.log(select_tweets_where_ufr_state)
+							db.all(select_tweets_where_ufr_state, (err, rows) => {
+								if (err) {
+									console.log(err)
+									res.status(400).json({
+										"status": "error",
+										"message": err.message
+									})
+								} else {
+									console.log(rows)
+									let fixed_rows = []
+									rows.forEach(function(t_row){
+										let fixed_row = {
+											"id": t_row["id"],
+											"content": t_row["content"],
+											"user_id": t_row["user_id"],
+											"created_at": t_row["created_at"]
+										}
+										fixed_rows.push(fixed_row)
+									})
+									res.status(200).json({
+										"status": "ok",
+										"tweets": fixed_rows
+									})
+								}
 							})
 						}
-					});
+					})
 				} else {
 					console.log("user authentification failed...")
 					res.status(200).json({

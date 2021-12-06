@@ -65,7 +65,7 @@ const Tweet = () => {
 
 	return(
 		<div>
-			<Link to="/tweets" className="btn">ツイート一覧に戻る</Link>
+			<Link to="/tweets" className="btn">ツイートタイムラインに戻る</Link>
 			<div className="tweetcard">
 				<div className="tweetcard-title">
 					{ user["avatar_image_url"] == "" &&

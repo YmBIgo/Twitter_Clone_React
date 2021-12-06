@@ -17,7 +17,10 @@
 }
 .tweet-nav-link{
   float:left;
-  margin-left:20px;
+  margin-left:10px;
+  width:250px;
+  border:1px solid rgba(100, 100, 100, .7);
+  padding:10px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
