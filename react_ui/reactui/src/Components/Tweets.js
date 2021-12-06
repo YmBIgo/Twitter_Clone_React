@@ -53,6 +53,7 @@ const Tweets = () => {
 				}).then((response2) => {
 					console.log(response2)
 					setTweets(response2["data"]["tweets"])
+					window.location.assign("/")
 				})
 			}
 		})
@@ -83,7 +84,9 @@ const Tweets = () => {
 			}
 			{ userSignedIn == 1 &&
 				<div>
-					<h4>ツイートタイムライン</h4>
+					<h4 className="tweet-page-title">
+						ツイートタイムライン
+					</h4>
 					<div>
 						{tweets.map((tweet, index) => {
 							let user_name = "";
@@ -106,17 +109,27 @@ const Tweets = () => {
 							let tweet_show_url = "/tweets/" + tweet.id
 							return(
 								<div className="tweetcard">
-									<div className="tweetcard-title">
-										<img className="user-avatar-img" />
-										<Link to={"/users/"+tweet.user_id} className="tweet-user-name">
-											<span className="tweets-username">{user_name}</span>
-										</Link>
+									<div className="tweetcard-title row">
+										<div class="col-2">
+											<img className="user-avatar-img" />
+										</div>
+										<div class="col-10">
+											<Link to={"/users/"+tweet.user_id} className="tweet-user-name">
+												<strong>
+													<span className="tweets-username">{user_name}</span>
+												</strong>
+											</Link>
+											<br />
+											{tweet.created_at}
+											<Link to={tweet_show_url} className="tweetcard-content-a">
+												<div className="tweetcard-content">
+													{tweet.content}
+												</div>
+											</Link>
+										</div>
+										<hr />
 									</div>
-									<div className="tweetcard-content">
-										<Link to={tweet_show_url}>
-											{tweet.content}
-										</Link>
-									</div>
+					
 								</div>
 							)
 						})}

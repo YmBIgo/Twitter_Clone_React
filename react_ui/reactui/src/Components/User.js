@@ -110,19 +110,19 @@ const User = () => {
 			{ user != undefined &&
 				<div>
 					<div className="users-info-card">
-						<div className="user-info-title">
-							{ user["avatar_image_url"] == "" &&
-								<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img" />
-							}
-							{ user["avatar_image_url"] != "" &&
-								<img src={user["avatar_image_url"]} className="user-avatar-img" />
-							}
-							{user.lastname} {user.firstname}
-							<span className="user-info-title-email">
-								{user.email}
-							</span>
-							<div>
-								<Link to={'/users/'+user.id+'/following'}>{userIDFollowing.length} Following</Link>  <Link to={'/users/'+user.id+'/follow'}>{userIDFollow.length} Follow</Link>
+						<div className="user-info-title row">
+							<div className="col-2">
+								{ user["avatar_image_url"] == "" &&
+									<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img" />
+								}
+								{ user["avatar_image_url"] != "" &&
+									<img src={user["avatar_image_url"]} className="user-avatar-img" />
+								}
+							</div>
+							<div className="col-7">
+								{user.lastname} {user.firstname}
+							</div>
+							<div className="col-2">
 								{ (currentuser["id"] != 0 && currentuser["id"] != user["id"]) &&
 									<div>
 										{ userIDFollow.includes(currentuser["id"]) == false &&
@@ -135,7 +135,7 @@ const User = () => {
 								}
 							</div>
 						</div>
-						<hr />
+						<Link to={'/users/'+user.id+'/following'}>{userIDFollowing.length} Following</Link>  <Link to={'/users/'+user.id+'/follow'}>{userIDFollow.length} Follow</Link>
 						<div className="user-info-content">
 							{user.description}
 							<br />
@@ -151,22 +151,31 @@ const User = () => {
 					{tweets.map((tweet) => {
 						return(
 							<div className="tweetcard">
-								<div className="tweetcard-title">
-									{ user["avatar_image_url"] == "" &&
-										<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img" />
-									}
-									{ user["avatar_image_url"] != "" &&
-										<img src={user["avatar_image_url"]} className="user-avatar-img" />
-									}
-									<Link to={"/users/"+user.id}>
-									{user.lastname} {user.firstname}
-									</Link>
+								<div className="tweetcard-title row">
+									<div class="col-2">
+										{ user["avatar_image_url"] == "" &&
+											<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img" />
+										}
+										{ user["avatar_image_url"] != "" &&
+											<img src={user["avatar_image_url"]} className="user-avatar-img" />
+										}
+									</div>
+									<div class="col-10">
+										<Link to={"/users/"+user.id} className="tweet-user-name">
+											<strong>
+												{user.lastname} {user.firstname}
+											</strong>
+										</Link>
+										<br />
+										{tweet.created_at}
+										<div className="tweetcard-content">
+											<Link to={'/tweets/'+tweet.id} className="tweetcard-content-a">
+												{tweet.content}
+											</Link>
+										</div>
+									</div>
 								</div>
-								<div className="tweetcard-content">
-									<Link to={'/tweets/'+tweet.id}>
-										{tweet.content}
-									</Link>
-								</div>
+								<hr />
 							</div>
 						)
 					})}

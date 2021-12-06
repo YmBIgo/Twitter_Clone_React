@@ -84,33 +84,33 @@ const Users = () => {
 			{users.map((user, index) => {
 				return (
 					<div className="users-info-card">
-						<div className="user-info-title">
-							{ user["avatar_image_url"] == "" &&
-								<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img" />
-							}
-							{ user["avatar_image_url"] != "" &&
-								<img src={user["avatar_image_url"]} className="user-avatar-img" />
-							}
-							<Link to={'/users/'+user.id}>
-								{user.lastname} {user.firstname} 
-							</Link>
-							<span className="user-info-title-email">
-								{user.email}
-							</span>
-							{ (currentuser["id"] != 0 && followID.includes(user.id) == false && currentuser["id"] != user["id"] ) &&
-								<div>
-									<br />
-									<button className="btn btn-info" userid={user.id} onClick={() => followUser(user)}>follow</button>
-								</div>
-							}
-							{ (currentuser["id"] != 0 && followID.includes(user.id) == true) &&
-								<div>
-									<br />
-									<button className="btn btn-danger" userid={user.id} onClick={() => unfollowUser(user)}>Unfollow</button>
-								</div>
-							}
+						<div className="user-info-title row">
+							<div className="col-2">
+								{ user["avatar_image_url"] == "" &&
+									<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img" />
+								}
+								{ user["avatar_image_url"] != "" &&
+									<img src={user["avatar_image_url"]} className="user-avatar-img" />
+								}
+							</div>
+							<div className="col-7">
+								<Link to={'/users/'+user.id}>
+									{user.lastname} {user.firstname} 
+								</Link>
+							</div>
+							<div className="col-2">
+								{ (currentuser["id"] != 0 && followID.includes(user.id) == false && currentuser["id"] != user["id"] ) &&
+									<div>
+										<button className="btn btn-info" userid={user.id} onClick={() => followUser(user)}>follow</button>
+									</div>
+								}
+								{ (currentuser["id"] != 0 && followID.includes(user.id) == true) &&
+									<div>
+										<button className="btn btn-danger" userid={user.id} onClick={() => unfollowUser(user)}>Unfollow</button>
+									</div>
+								}
+							</div>
 						</div>
-						<hr />
 						<div className="user-info-content">
 							{user.description}
 						</div>

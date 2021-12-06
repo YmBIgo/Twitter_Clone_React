@@ -67,21 +67,31 @@ const Tweet = () => {
 		<div>
 			<Link to="/tweets" className="btn">ツイートタイムラインに戻る</Link>
 			<div className="tweetcard">
-				<div className="tweetcard-title">
-					{ user["avatar_image_url"] == "" &&
-						<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img" />
-					}
-					{ user["avatar_image_url"] != "" &&
-						<img src={user["avatar_image_url"]} className="user-avatar-img" />
-					}
-					<Link to={'/users/'+user.id}>{user.lastname} {user.firstname}</Link>
-				</div>
-				<div className="tweetcard-content">
-					{tweet.content}
-					<br />
-					{currentUser["id"] == tweet["user_id"] &&
-						<button className="btn btn-sm btn-danger" onClick={delete_tweet}>ツイートを削除する</button>
-					}
+				<div className="tweetcard-title row">
+					<div class="col-2">
+						{ user["avatar_image_url"] == "" &&
+							<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img-big" />
+						}
+						{ user["avatar_image_url"] != "" &&
+							<img src={user["avatar_image_url"]} className="user-avatar-img-big" />
+						}
+					</div>
+					<div class="col-10">
+						<Link to={'/users/'+user.id}>
+							{user.lastname} {user.firstname}
+						</Link>
+						<div className="tweetcard-content">
+							<h5>
+								{tweet.content}
+							</h5>
+							{tweet.created_at}
+							<br />
+							{currentUser["id"] == tweet["user_id"] &&
+								<button className="btn btn-sm btn-danger" onClick={delete_tweet}>ツイートを削除する</button>
+							}
+						</div>
+					</div>
+					<hr />
 				</div>
 			</div>
 		</div>

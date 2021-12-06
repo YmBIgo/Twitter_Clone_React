@@ -9,18 +9,31 @@
 
 .app {
   margin-left:15px;
+  width:1200px;
 }
 
 .tweet-nav{
   list-style: none;
   overflow: hidden;
+  background-color:rgba(30,144,255);
+  height:500px;
+}
+.tweet-nav-link-title{
+  color:white;
+  text-decoration: none;
+  margin-left:20px;
 }
 .tweet-nav-link{
-  float:left;
-  margin-left:10px;
-  width:250px;
-  border:1px solid rgba(100, 100, 100, .7);
+  margin-left:-10px;
   padding:10px;
+  font-size:20px;
+  color:white;
+  text-decoration: none;
+}
+.tweet-nav-link-img{
+  border-radius:100%;
+  width:150px;
+  height:150px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
