@@ -100,6 +100,7 @@ const UserEdit = () => {
 			}
 			{ userSignedIn == 1 &&
 				<div>
+					<br />
 					<div className="users-info-card">
 						<h4>ユーザー画像を編集する</h4>
 						{// なんかビミョウ

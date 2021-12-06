@@ -80,6 +80,12 @@ const Header = () => {
               </Link>
             </div>
           }
+          { currentuser["id"] == 0 &&
+            <div>
+              <Link to="" className="tweet-nav-link-title">
+              </Link>
+            </div>
+          }
           <img src={currentuser["avatar_image_url"]} className="tweet-nav-link-img" />
         </li>
         <br />

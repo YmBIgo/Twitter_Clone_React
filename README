@@ -18,6 +18,8 @@
 
 	これで、localhost:3000 に ログイン機能を備えた [ users 一覧・詳細・更新・フォロー ] [ tweets タイムライン・詳細・作成・削除 ] の React UI ができました。
 
+	→ デモ動画 https://www.youtube.com/watch?v=SL9zO7AAv3g
+
 3 : 未実装
-	A : ユーザー登録
+	A : Like 機能
 	B : メッセージ機能

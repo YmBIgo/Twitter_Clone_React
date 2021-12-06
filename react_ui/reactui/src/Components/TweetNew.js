@@ -39,8 +39,24 @@ const TweetNew = () => {
 			withCredentials: true
 		}).then((response) => {
 			if ( response["data"]["changes"] == 1 ) {
+				fixHeader()
 				setUserSignedIn(1)
 			}
+		})
+	}
+
+	const fixHeader = () => {
+		axios({
+			method: "GET",
+			url: "http://localhost:3002/signed_in_user",
+			withCredentials: true
+		}).then((response) => {
+			let avatar_image_url = response["data"]["user"]["avatar_image_url"]
+			let full_name = response["data"]["user"]["lastname"] + " " + response["data"]["user"]["firstname"] + "さん"
+			let header_li = document.getElementsByClassName("tweet-nav-link-title")[0]
+			let header_img = document.getElementsByClassName("tweet-nav-link-img")[0]
+			header_img.setAttribute("src", avatar_image_url)
+			header_li.innerText = full_name
 		})
 	}
 

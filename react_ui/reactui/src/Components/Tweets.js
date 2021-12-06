@@ -35,6 +35,21 @@ const Tweets = () => {
 		})
 	}
 
+	const fixHeader = () => {
+		axios({
+			method: "GET",
+			url: "http://localhost:3002/signed_in_user",
+			withCredentials: true
+		}).then((response) => {
+			let avatar_image_url = response["data"]["user"]["avatar_image_url"]
+			let full_name = response["data"]["user"]["lastname"] + " " + response["data"]["user"]["firstname"] + "さん"
+			let header_li = document.getElementsByClassName("tweet-nav-link-title")[0]
+			let header_img = document.getElementsByClassName("tweet-nav-link-img")[0]
+			header_img.setAttribute("src", avatar_image_url)
+			header_li.innerText = full_name
+		})
+	}
+
 	const userLogin = (event) => {
 		let email = document.getElementsByClassName("email-input")[0].value
 		let password = document.getElementsByClassName("password-input")[0].value
@@ -53,6 +68,7 @@ const Tweets = () => {
 				}).then((response2) => {
 					console.log(response2)
 					setTweets(response2["data"]["tweets"])
+					fixHeader()
 					window.location.assign("/")
 				})
 			}
