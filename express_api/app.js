@@ -238,3 +238,25 @@ app.get("/users/:id/following", cors(corsOptions), (req, res) => {
 	tweet_db.select_from_user_follow_by_user_id(db, user_id, res)
 })
 
+// Likes
+app.post("/tweets/:id/like", cors(corsOptions), (req, res) => {
+	let user_data = {
+		"email": req.cookies["email"],
+		"cookietext": req.cookies["cookietext"]
+	}
+	let tweet_id = req.params.id
+	tweet_db.create_like(db, tweet_id, user_data, res)
+})
+app.post("/tweets/:id/unlike", cors(corsOptions), (req, res) => {
+	let user_data = {
+		"email": req.cookies["email"],
+		"cookietext": req.cookies["cookietext"]
+	}
+	let tweet_id = req.params.id
+	tweet_db.remove_like(db, tweet_id, user_data, res)
+})
+app.get("/tweets/:id/like", cors(corsOptions), (req, res) => {
+	let tweet_id = req.params.id
+	tweet_db.select_all_likes(db, tweet_id, res)
+})
+

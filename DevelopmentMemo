@@ -24,3 +24,7 @@
 ・更新時の入力フォーム
 	@ /react_ui/reactui/src/UserEdit.js
 	value={hoge} をしている場合に、hoge で 一々 setState をしている。もっと短く書ける方法はないか？
+
+・ログイン後にHeaderのログアウトが出てこない
+	@ /react_ui/reactui/src/App.js
+	App.js の Header 内の State で ログアウト・画像の表示を条件分けしているが、ログインした後で ログアウトの表示が消えてしまい再表示されない。

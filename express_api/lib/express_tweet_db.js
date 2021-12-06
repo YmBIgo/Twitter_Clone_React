@@ -614,6 +614,8 @@ function get_tweets_from_user_id(db, user_id){
 	})
 }
 
+// User Follow Relations
+
 function create_user_follow_relation(db, user_id, user_data, res){
 	db.serialize(() => {
 		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, user_row) => {
@@ -805,6 +807,147 @@ function select_from_user_follow_by_user_id(db, user_id, res){
 	})
 }
 
+// Likes
+function create_like(db, tweet_id, user_data, res){
+	db.serialize(() => {
+		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, row) => {
+			if (err) {
+				console.log(err)
+				res.status(400).json({
+					"status": "error",
+					"message": err
+				})
+			} else {
+				if (row != undefined){
+					//
+					const check_like_state = "SELECT * FROM LIKES WHERE tweet_id = ? AND user_id = ?;"
+					db.get(check_like_state, tweet_id, row["id"], (err, l_row) => {
+						if (err) {
+							console.log(err)
+							res.status(400).json({
+								"status": "error",
+								"message": err
+							})
+						} else if ( l_row == undefined ) {
+							const insert_like_state = db.prepare("INSERT INTO LIKES(tweet_id, user_id) VALUES(?, ?)");
+							insert_like_state.run(tweet_id, row["id"], (err, result) => {
+								if (err) {
+									console.log(err)
+									res.status(400).json({
+										"status": "error",
+										"message": err
+									})	
+								} else {
+									res.status(200).json({
+										"status": "ok",
+										"lastID": insert_like_state.lastID
+									})
+								}
+							})
+						} else {
+							console.log("data is already exist")
+							res.status(200).json({
+								"status": "data already exist error",
+								"message": "data already exist"
+							})
+						}
+					})
+				} else {
+					console.log("user authentification error")
+					res.status(200).json({
+						"status": "user authentification error",
+						"message": "user authentification failed..."
+					})
+				}
+			}
+		})
+	})
+}
+
+function remove_like(db, tweet_id, user_data, res){
+	db.serialize(() => {
+		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?", user_data["email"], user_data["cookietext"], (err, row) => {
+			if (err) {
+				console.log(err)
+				res.statu(400).json({
+					"status": "error",
+					"message": err
+				})
+			} else if (row != undefined){
+				const delete_like_state = db.prepare("DELETE FROM LIKES WHERE tweet_id = ? AND user_id = ?")
+				delete_like_state.run(tweet_id, row["id"], (err, result) => {
+					if (err) {
+						console.log(err)
+						res.statu(400).json({
+							"status": "error",
+							"message": err
+						})
+					} else {
+						console.log(delete_like_state.changes)
+						res.status(200).json({
+							"status": "ok",
+							"changes": delete_like_state.changes
+						})
+					}
+				})
+			} else {
+				console.log("user authentification error")
+				res.status(200).json({
+					"status": "user authentification error",
+					"message": "user authentification failed..."
+				})
+			}
+		})
+	})
+}
+
+function select_all_likes(db, tweet_id, res){
+	db.serialize(() => {
+		db.all("SELECT * FROM LIKES WHERE tweet_id = ?", tweet_id, (err, rows) => {
+			if (err) {
+				console.log(err)
+				res.statu(400).json({
+					"status": "error",
+					"message": err
+				})
+			} else {
+				let user_where_sql = ""
+				rows.forEach(function(row) {
+					user_where_sql += row["user_id"] + ","
+				})
+				user_where_sql = user_where_sql.slice(0, user_where_sql.length-1)
+				let select_user_state = "SELECT * FROM USERS WHERE id IN (" + user_where_sql + ");"
+				db.all(select_user_state, (err, user_rows) => {
+					if (err) {
+						console.log(err)
+						res.statu(400).json({
+							"status": "error",
+							"message": err
+						})
+					} else {
+						let fixed_user_rows = []
+						user_rows.forEach(function(user_row){
+							let fixed_user_row = {
+								"id": user_row["id"],
+								"lastname": user_row["lastname"],
+								"firstname": user_row["firstname"],
+								"description": user_row["description"],
+								"avatar_image_url": user_row["avatar_image_url"],
+								"created_at": user_row["created_at"]
+							}
+							fixed_user_rows.push(fixed_user_row)
+						})
+						res.status(200).json({
+							"status": "ok",
+							"users": fixed_user_rows
+						})
+					}
+				})
+			}
+		})
+	})
+}
+
 module.exports.initialize_db = initialize_db;
 module.exports.md5base64 = md5base64;
 // users
@@ -829,3 +972,7 @@ module.exports.create_user_follow_relation = create_user_follow_relation;
 module.exports.remove_user_follow_relation = remove_user_follow_relation;
 module.exports.select_to_user_follow_by_user_id = select_to_user_follow_by_user_id;
 module.exports.select_from_user_follow_by_user_id = select_from_user_follow_by_user_id;
+// like
+module.exports.create_like = create_like;
+module.exports.remove_like = remove_like;
+module.exports.select_all_likes = select_all_likes;
