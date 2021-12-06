@@ -79,7 +79,7 @@ const TweetNew = () => {
 			}
 			{ userSignedIn == 1 &&
 				<div>
-					<Link to="/tweets">
+					<Link to="/tweets" className="btn">
 						ツイート一覧
 					</Link>
 					<div className="tweetcard">
