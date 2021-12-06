@@ -7,6 +7,8 @@ import UserEdit from "./Components/UserEdit"
 import Tweets from "./Components/Tweets"
 import Tweet from "./Components/Tweet"
 import TweetNew from "./Components/TweetNew"
+import Follow from "./Components/Follow"
+import Following from "./Components/Following"
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
           <Route exact path="/tweets" element={ <Tweets/> } />
           <Route exact path="/tweets/:id" element={ <Tweet/> } />
           <Route exact path="/tweets/new" element={ <TweetNew/> } />
+          <Route exact path="/users/:id/follow" element={ <Follow/> } />
+          <Route exact path="/users/:id/following" element={ <Following/> } />
         </Routes>
       </div>
     </BrowserRouter>

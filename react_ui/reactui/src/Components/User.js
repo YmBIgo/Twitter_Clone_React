@@ -9,6 +9,8 @@ const User = () => {
 	const [user, setUser] = useState({});
 	const [tweets, setTweets] = useState([]);
 	const [currentuser, setCurrentuser] = useState({});
+	const [userIDFollow, setUserIDFollow] = useState([]);
+	const [userIDFollowing, setUserIDFollowing] = useState([]);
 	const query = useParams();
 	const useeffect_counter = 0;
 
@@ -25,6 +27,7 @@ const User = () => {
 			setUser(response["data"]["user"])
 		})
 		if ( user != undefined ){
+			// tweets
 			let user_tweets_api_url = "http://localhost:3002/users/" + query.id + "/tweets"
 			axios({
 				method: "GET",
@@ -33,15 +36,72 @@ const User = () => {
 				console.log(response2["data"]["tweets"])
 				setTweets(response2["data"]["tweets"])
 			})
+			// current user
 			let user_signed_in_api_url = "http://localhost:3002/signed_in_user"
 			axios({
 				method: "GET",
 				url: user_signed_in_api_url,
 				withCredentials: true
 			}).then((response3) => {
-				setCurrentuser(response3["data"]["user"]);
+				if (response3["data"]["user"] != undefined){
+					setCurrentuser(response3["data"]["user"]);
+				} else {
+					setCurrentuser({"id": 0})
+				}
 			})
+			followStatus()
 		}
+	}
+
+	const followStatus = () => {
+		// follow
+		let user_follow_api_url = "http://localhost:3002/users/" + query.id + "/follow"
+		axios({
+			method: "GET",
+			url: user_follow_api_url
+		}).then((response4) => {
+			let follow_array = []
+			response4["data"]["users"].forEach(function(user_row){
+				follow_array.push(user_row["id"])
+			})
+			setUserIDFollow(follow_array)
+		})
+		// following
+		let user_following_api_url = "http://localhost:3002/users/" + query.id + "/following"
+		axios({
+			method: "GET",
+			url: user_following_api_url
+		}).then((response5) => {
+			let following_array = []
+			response5["data"]["users"].forEach(function(user_row){
+				following_array.push(user_row["id"])
+			})
+			setUserIDFollowing(response5["data"]["users"])
+		})
+	}
+
+	const followUser = () => {
+		let follow_user_api_url = "http://localhost:3002/follow/" + user.id
+		axios({
+			method: "POST",
+			url: follow_user_api_url,
+			withCredentials: true
+		}).then((response) => {
+			console.log(response["data"])
+		})
+		followStatus()
+	}
+
+	const unfollowUser = () => {
+		let unfollow_user_api_url = "http://localhost:3002/unfollow/" + user.id
+		axios({
+			method: "POST",
+			url: unfollow_user_api_url,
+			withCredentials: true
+		}).then((response) => {
+			console.log(response["data"])
+		})
+		followStatus()
 	}
 
 	return(
@@ -61,10 +121,24 @@ const User = () => {
 							<span className="user-info-title-email">
 								{user.email}
 							</span>
+							<div>
+								<Link to={'/users/'+user.id+'/following'}>{userIDFollowing.length} Following</Link>  <Link to={'/users/'+user.id+'/follow'}>{userIDFollow.length} Follow</Link>
+								{ (currentuser["id"] != 0 && currentuser["id"] != user["id"]) &&
+									<div>
+										{ userIDFollow.includes(currentuser["id"]) == false &&
+											<input type="button" className="btn btn-info" value="Follow" onClick={followUser} />
+										}
+										{ userIDFollow.includes(currentuser["id"]) == true &&
+											<input type="button" className="btn btn-danger" value="Unfollow" onClick={unfollowUser} />
+										}
+									</div>
+								}
+							</div>
 						</div>
 						<hr />
 						<div className="user-info-content">
 							{user.description}
+							<br />
 						</div>
 						{ currentuser["id"] == user["id"] &&
 							<div>
