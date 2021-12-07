@@ -3,6 +3,8 @@ import axios from "axios";
 import { useParams, Link } from "react-router-dom"
 import "./CSS/Users.css"
 import "./CSS/Tweets.css"
+import heart_dark from "./IMG/heart_dark.svg"
+import heart_normal from "./IMG/heart_normal.jpg"
 
 const User = () => {
 
@@ -104,6 +106,40 @@ const User = () => {
 		followStatus()
 	}
 
+	const like_tweet = (tweet_id, index) => {
+		document.getElementsByClassName("like-section")[index].classList.remove("hidden-like")
+		document.getElementsByClassName("no-like-section")[index].classList.add("hidden-like")
+		//
+		axios({
+			method: "POST",
+			url: "http://localhost:3002/tweets/" + tweet_id + "/like",
+			withCredentials: true
+		})
+		get_current_like_status(tweet_id, index)
+	}
+
+	const cancel_like_tweet = (tweet_id, index) => {
+		document.getElementsByClassName("like-section")[index].classList.add("hidden-like")
+		document.getElementsByClassName("no-like-section")[index].classList.remove("hidden-like")
+		//
+		axios({
+			method: "POST",
+			url: "http://localhost:3002/tweets/" + tweet_id + "/unlike",
+			withCredentials: true
+		})
+		get_current_like_status(tweet_id, index)
+	}
+
+	const get_current_like_status = (tweet_id, index) => {
+		axios({
+			method: "GET",
+			url: "http://localhost:3002/tweets/" + tweet_id + "/like"
+		}).then((response) => {
+			document.getElementsByClassName("like-length")[index].innerText = response["data"]["users"].length
+			document.getElementsByClassName("no-like-length")[index].innerText = response["data"]["users"].length
+		})
+	}
+
 	return(
 		<div>
 			<Link to="/users" className="btn">ユーザー一覧に戻る</Link>
@@ -148,7 +184,26 @@ const User = () => {
 					</div>
 					<br/>
 					<h4>ツイート一覧</h4>
-					{tweets.map((tweet) => {
+					{tweets.map((tweet, index) => {
+						axios({
+							method: "GET",
+							url: "http://localhost:3002/tweets/" + tweet.id + "/like"
+						}).then((response) => {
+							let user_like = []
+							response["data"]["users"].forEach(function(item){
+								user_like.push(item["id"])
+							})
+							console.log(user_like, currentuser["id"])
+							if (user_like.includes(currentuser["id"]) == true){
+								document.getElementsByClassName("like-section")[index].classList.remove("hidden-like");
+								document.getElementsByClassName("no-like-section")[index].classList.add("hidden-like");
+								document.getElementsByClassName("like-length")[index].innerText = user_like.length
+							} else if (user_like.includes(currentuser["id"]) == false){
+								document.getElementsByClassName("like-section")[index].classList.add("hidden-like");
+								document.getElementsByClassName("no-like-section")[index].classList.remove("hidden-like");
+								document.getElementsByClassName("no-like-length")[index].innerText = user_like.length
+							}
+						})
 						return(
 							<div className="tweetcard">
 								<div className="tweetcard-title row">
@@ -172,6 +227,18 @@ const User = () => {
 											<Link to={'/tweets/'+tweet.id} className="tweetcard-content-a">
 												{tweet.content}
 											</Link>
+											<div className="like-section">
+												<div className="like-row">
+													<img src={heart_normal} className="like-img" onClick={()=>cancel_like_tweet(tweet.id, index)}/>
+													<span className="like-length">0</span>
+												</div>
+											</div>
+											<div className="no-like-section">
+												<div className="like-row">
+													<img src={heart_dark} className="no-like-img" onClick={()=>like_tweet(tweet.id, index)}/>
+													<span className="no-like-length">0</span>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>

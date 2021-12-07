@@ -28,3 +28,12 @@
 ・ログイン後にHeaderのログアウトが出てこない
 	@ /react_ui/reactui/src/App.js
 	App.js の Header 内の State で ログアウト・画像の表示を条件分けしているが、ログインした後で ログアウトの表示が消えてしまい再表示されない。
+
+・Controller ファイルの分割
+	@ express_tweet_db.js
+	User・Tweet・Like・Follow で分割したほうが見やすい
+
+・Like の API設計
+	@ express_tweet_db.js
+	like 取得が、ユーザー全取得になっていてデータが増えると時間がかかる。配列だけ取得できる API の URL を開けておくなり、改善の余地があるところ。
+
