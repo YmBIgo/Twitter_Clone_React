@@ -31,3 +31,25 @@
 	width:350px;
 	margin:10px 0;
 }
+/* Like */
+.like-row{
+	margin:3px 0;
+}
+.like-img{
+	width:20px;
+	height:20px;
+}
+.no-like-row{
+	margin:3px 0;
+}
+.no-like-img{
+	width:20px;
+	height:20px;
+}
+.hidden-like{
+	display:none;
+}
+.show-like{
+	display:block;
+}
+
