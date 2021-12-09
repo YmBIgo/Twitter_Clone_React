@@ -100,7 +100,7 @@ const TweetNew = () => {
 			{ userSignedIn == 1 &&
 				<div>
 					<Link to="/tweets" className="btn">
-						ツイート一覧
+						ツイートタイムラインに戻る
 					</Link>
 					<div className="tweetcard">
 						<h4>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import TweetComponent from "./TweetComponent"
+import UserComponent from "./UserComponent"
 import "./CSS/Tweets.css"
 import heart_dark from "./IMG/heart_dark.svg"
 import heart_normal from "./IMG/heart_normal.jpg"
@@ -9,6 +10,7 @@ import heart_normal from "./IMG/heart_normal.jpg"
 const Tweets = () => {
 	const [userSignedIn, setUserSignedIn] = useState(0);
 	const [currentuser, setCurrentuser] = useState({});
+	const [users, setUsers] = useState([]);
 	const [tweets, setTweets] = useState([]);
 	const useeffect_counter = 0;
 
@@ -32,8 +34,15 @@ const Tweets = () => {
 					url: "http://localhost:3002/tweets",
 					withCredentials: true
 				}).then((response2) => {
-					console.log(response2)
 					setTweets(response2["data"]["tweets"])
+					if ( response2["data"]["tweets"].length == 0 ) {
+						axios({
+							method: "GET",
+							url: "http://localhost:3002/users"
+						}).then((response3) => {
+							setUsers(response3["data"]["users"])
+						})
+					}
 				})
 			}
 			console.log(response)
@@ -105,16 +114,30 @@ const Tweets = () => {
 			}
 			{ userSignedIn == 1 &&
 				<div>
-					<h4 className="tweet-page-title">
-						ツイートタイムライン
-					</h4>
-					<div>
-						{tweets.map((tweet, index) => {
-							return(
-								<TweetComponent tweet_id={tweet.id} t_index={index} is_timeline="1" />
-							)
-						})}
-					</div>
+					{ tweets.length != 0 &&
+						<>
+							<h4 className="tweet-page-title">
+								ツイートタイムライン
+							</h4>
+							<div>
+								{tweets.map((tweet, index) => {
+									return(
+										<TweetComponent tweet_id={tweet.id} t_index={index} is_timeline="1" />
+									)
+								})}
+							</div>
+						</>
+					}
+					{ tweets.length == 0 &&
+						<div>
+							<h4 class="start-twitter-title">ユーザーをフォローして ツイッターを始めよう！</h4>
+							{users.map((user) => {
+								return(
+									<UserComponent user_id={user.id} />
+								)
+							})}
+						</div>
+					}
 				</div>
 			}
 		</div>

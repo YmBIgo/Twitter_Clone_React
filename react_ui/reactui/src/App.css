@@ -16,7 +16,10 @@
   list-style: none;
   overflow: hidden;
   background-color:rgba(30,144,255);
-  height:800px;
+  position:fixed;
+  height:100%;
+  padding-left:70px;
+  padding-right:70px;
 }
 .tweet-nav-link-title{
   color:white;

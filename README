@@ -16,9 +16,9 @@
 	yarn start
 	‘‘‘
 
-	これで、localhost:3000 に ログイン機能を備えた [ users 一覧・詳細・更新・フォロー ] [ tweets タイムライン・詳細・作成・削除・Like ] の React UI ができました。
+	これで、localhost:3000 に ログイン機能を備えた [ users 一覧・詳細・更新・フォロー・リプライ ] [ tweets タイムライン・詳細・作成・削除・Like ] の React UI ができました。
 
-	→ デモ動画 https://youtu.be/QYd7UL74bHY
+	→ デモ動画 https://youtu.be/L80DRYbZll4
 
 → 開発メモ DevelopmentMemo
 
