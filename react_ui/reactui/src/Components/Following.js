@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
+import UserComponent from "./UserComponent"
 import "./CSS/Users.css"
 
 const Following = () => {
@@ -44,26 +45,7 @@ const Following = () => {
 			}
 			{followings.map((following) => {
 				return(
-					<div className="users-info-card">
-						<div className="user-info-title">
-							{ following["avatar_image_url"] == "" &&
-								<img src="https://storage.googleapis.com/tweet_storage_0218/default/twitter.png" className="user-avatar-img" />
-							}
-							{ following["avatar_image_url"] != "" &&
-								<img src={following["avatar_image_url"]} className="user-avatar-img" />
-							}
-							<Link to={'/users/'+following.id}>
-								{following.lastname} {following.firstname} 
-							</Link>
-							<span className="user-info-title-email">
-								{following.email}
-							</span>
-						</div>
-						<hr />
-						<div className="user-info-content">
-							{following.description}
-						</div>
-					</div>
+					<UserComponent user_id={following.id} />
 				)
 			})}
 		</div>

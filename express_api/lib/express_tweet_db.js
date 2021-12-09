@@ -379,7 +379,7 @@ function select_all_tweet(db, user_data, res) {
 								"message": err.message
 							})
 						} else if (ufr_rows == undefined) {
-							db.all("SELECT * FROM TWEETS WHERE user_id = ?;", row["id"], (err, rows) => {
+							db.all("SELECT * FROM TWEETS WHERE user_id = ? ORDER BY created_at DESC;", row["id"], (err, rows) => {
 								if (err) {
 									console.log(err)
 									res.status(400).json({
@@ -410,7 +410,7 @@ function select_all_tweet(db, user_data, res) {
 								sql_where_ufr_id += ufr_row["to_user_id"] + ","
 							})
 							sql_where_ufr_id = sql_where_ufr_id.slice(0, sql_where_ufr_id.length-1)
-							let select_tweets_where_ufr_state = "SELECT * FROM TWEETS WHERE user_id in (" + sql_where_ufr_id + ")"
+							let select_tweets_where_ufr_state = "SELECT * FROM TWEETS WHERE user_id in (" + sql_where_ufr_id + ") ORDER BY created_at DESC;"
 							console.log(select_tweets_where_ufr_state)
 							db.all(select_tweets_where_ufr_state, (err, rows) => {
 								if (err) {
@@ -701,7 +701,7 @@ function remove_user_follow_relation(db, user_id, user_data, res){
 							})
 						} else {
 							console.log(delete_user_follow_state.changes)
-							res.status(400).json({
+							res.status(200).json({
 								"status": "ok",
 								"changes": delete_user_follow_state.changes
 							})
