@@ -452,7 +452,7 @@ function select_all_tweet(db, user_data, res) {
 
 function select_id_tweet(db, tweet_id, res){
 	db.serialize(() => {
-		db.get("SELECT * FROM TWEETS WHERE id = ? AND is_reply = 0", tweet_id, (err, row) => {
+		db.get("SELECT * FROM TWEETS WHERE id = ?", tweet_id, (err, row) => {
 			if (err) {
 				console.log(err)
 				res.status(400).json({

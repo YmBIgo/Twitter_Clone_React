@@ -52,4 +52,26 @@
 .show-like{
 	display:block;
 }
-
+/* reply */
+.tweet-reply-title{
+	margin-left:10px;
+	margin-bottom:10px;
+}
+.reply-textarea-input{
+	width:85%;
+	margin-bottom:10px;
+}
+.reply-length{
+}
+.reply-img{
+	width:20px;
+	height:20px;
+	margin-left:10%;
+}
+.no-like-reply-length{
+}
+.no-like-reply-img{
+	width:20px;
+	height:20px;
+	margin-left:10%;
+}

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import "./CSS/Tweets.css"
 import heart_dark from "./IMG/heart_dark.svg"
 import heart_normal from "./IMG/heart_normal.jpg"
+import reply_normal from "./IMG/reply.png"
 
 const TweetComponent = (props) => {
 
@@ -62,16 +63,25 @@ const TweetComponent = (props) => {
 						console.log("hide like", user_like, currentUser["id"])
 						document.getElementsByClassName("like-section")[props.t_index].classList.add("hidden-like");
 						// document.getElementsByClassName("no-like-section")[0].classList.add("show-like");
-						document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length
-						document.getElementsByClassName("no-like-length")[props.t_index].innerText = user_like.length
+						document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length + "Likes";
+						document.getElementsByClassName("no-like-length")[props.t_index].innerText = user_like.length + "Likes";
 					} else if ( user_like.includes(response2["data"]["user"]["id"]) == true ) {
 						console.log("hide no like", user_like, currentUser["id"])
 						document.getElementsByClassName("no-like-section")[props.t_index].classList.add("hidden-like");
 						// document.getElementsByClassName("no-like-section")[0].classList.add("show-like");
-						document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length
-						document.getElementsByClassName("no-like-length")[props.t_index].innerText = user_like.length
+						document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length + "Likes";
+						document.getElementsByClassName("no-like-length")[props.t_index].innerText = user_like.length + "Likes";
 					}
 				})
+			})
+			// Reply
+			let reply_api_url = "http://localhost:3002/tweets/" + props.tweet_id + "/reply"
+			axios({
+				method: "GET",
+				url: reply_api_url
+			}).then((response) => {
+				document.getElementsByClassName("reply-length")[props.t_index].innerText = response["data"]["replys"].length + "Replys"
+				document.getElementsByClassName("no-like-reply-length")[props.t_index].innerText = response["data"]["replys"].length + "Replys"
 			})
 		})
 	}
@@ -122,8 +132,8 @@ const TweetComponent = (props) => {
 			url: current_like_url
 		}).then((response) => {
 			let user_count = response["data"]["users"].length
-			document.getElementsByClassName("like-length")[index].innerText = user_count;
-			document.getElementsByClassName("no-like-length")[index].innerText = user_count;
+			document.getElementsByClassName("like-length")[index].innerText = user_count + "Likes";
+			document.getElementsByClassName("no-like-length")[index].innerText = user_count + "Likes";
 		})
 	}
 
@@ -166,13 +176,17 @@ const TweetComponent = (props) => {
 								<div className="like-section">
 									<div className="like-row">
 										<img src={heart_normal} className="like-img" onClick={()=>cancel_like_post(tweet.id, props.t_index)} />
-										<span className="like-length">0</span>
+										<span className="like-length">0Likes</span>
+										<img src={reply_normal} className="reply-img" />
+										<span className="reply-length">0Replys</span>
 									</div>
 								</div>
 								<div className="no-like-section">
 									<div className="like-row">
 										<img src={heart_dark} className="no-like-img" onClick={()=>like_post(tweet.id, props.t_index)} />
-										<span className="no-like-length">0</span>
+										<span className="no-like-length">0Likes</span>
+										<img src={reply_normal} className="no-like-reply-img" />
+										<span className="no-like-reply-length">0Replys</span>
 									</div>
 								</div>
 							</div>
