@@ -79,7 +79,6 @@ function select_all_user(db, res){
 						"id": item["id"],
 						"firstname": item["firstname"],
 						"lastname": item["lastname"],
-						"email": item["email"],
 						"description": item["description"],
 						"avatar_image_url": item["avatar_image_url"],
 						"created_at": item["created_at"]
@@ -111,7 +110,6 @@ function select_id_user(db, user_id, res){
 						"id": row["id"],
 						"firstname": row["firstname"],
 						"lastname": row["lastname"],
-						"email": row["email"],
 						"description": row["description"],
 						"avatar_image_url": row["avatar_image_url"],
 						"created_at": row["created_at"]
@@ -148,7 +146,6 @@ function select_cookie_user(db, user_data, res){
 						"id": row["id"],
 						"firstname": row["firstname"],
 						"lastname": row["lastname"],
-						"email": row["email"],
 						"description": row["description"],
 						"avatar_image_url": row["avatar_image_url"],
 						"created_at": row["created_at"]
@@ -379,7 +376,7 @@ function select_all_tweet(db, user_data, res) {
 								"message": err.message
 							})
 						} else if (ufr_rows == undefined) {
-							db.all("SELECT * FROM TWEETS WHERE user_id = ? ORDER BY created_at DESC;", row["id"], (err, rows) => {
+							db.all("SELECT * FROM TWEETS WHERE user_id = ? AND is_reply = 0 ORDER BY created_at DESC;", row["id"], (err, rows) => {
 								if (err) {
 									console.log(err)
 									res.status(400).json({
@@ -394,6 +391,7 @@ function select_all_tweet(db, user_data, res) {
 											"id": t_row["id"],
 											"content": t_row["content"],
 											"user_id": t_row["user_id"],
+											"is_retweet": row["is_retweet"],
 											"created_at": t_row["created_at"]
 										}
 										fixed_rows.push(fixed_row)
@@ -410,7 +408,7 @@ function select_all_tweet(db, user_data, res) {
 								sql_where_ufr_id += ufr_row["to_user_id"] + ","
 							})
 							sql_where_ufr_id = sql_where_ufr_id.slice(0, sql_where_ufr_id.length-1)
-							let select_tweets_where_ufr_state = "SELECT * FROM TWEETS WHERE user_id in (" + sql_where_ufr_id + ") ORDER BY created_at DESC;"
+							let select_tweets_where_ufr_state = "SELECT * FROM TWEETS WHERE user_id in (" + sql_where_ufr_id + ") AND is_reply = 0 ORDER BY created_at DESC;"
 							console.log(select_tweets_where_ufr_state)
 							db.all(select_tweets_where_ufr_state, (err, rows) => {
 								if (err) {
@@ -427,6 +425,7 @@ function select_all_tweet(db, user_data, res) {
 											"id": t_row["id"],
 											"content": t_row["content"],
 											"user_id": t_row["user_id"],
+											"is_retweet": row["is_retweet"],
 											"created_at": t_row["created_at"]
 										}
 										fixed_rows.push(fixed_row)
@@ -453,7 +452,7 @@ function select_all_tweet(db, user_data, res) {
 
 function select_id_tweet(db, tweet_id, res){
 	db.serialize(() => {
-		db.get("SELECT * FROM TWEETS WHERE id = ?", tweet_id, (err, row) => {
+		db.get("SELECT * FROM TWEETS WHERE id = ? AND is_reply = 0", tweet_id, (err, row) => {
 			if (err) {
 				console.log(err)
 				res.status(400).json({
@@ -467,6 +466,7 @@ function select_id_tweet(db, tweet_id, res){
 						"id": row["id"],
 						"content": row["content"],
 						"user_id": row["user_id"],
+						"is_retweet": row["is_retweet"],
 						"created_at": row["created_at"]
 					}
 					res.status(200).json({
@@ -485,7 +485,7 @@ function select_id_tweet(db, tweet_id, res){
 }
 
 function select_user_tweets(db, user_id, res){
-	db.all("SELECT * FROM TWEETS WHERE user_id = ?", user_id, (err, rows) => {
+	db.all("SELECT * FROM TWEETS WHERE user_id = ? AND is_reply = 0 ORDER BY created_at DESC;", user_id, (err, rows) => {
 		if (err) {
 			console.log(err)
 			res.status(400).json({
@@ -499,6 +499,7 @@ function select_user_tweets(db, user_id, res){
 					"id": row["id"],
 					"content": row["content"],
 					"user_id": row["user_id"],
+					"is_retweet": row["is_retweet"],
 					"created_at": row["created_at"]
 				}
 				fixed_rows.push(fixed_row)
@@ -593,11 +594,79 @@ function delete_tweet(db, tweet_data, user_data, res){
 	})		
 }
 
+// Reply
+function create_reply(db, tweet_data, tweet_id, user_data, res){
+	db.serialize(() => {
+		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, row) => {
+			if (err) {
+				console.log(err)
+				res.status(400).json({
+					"status": "error",
+					"message": err.message
+				})
+			} else {
+				if (row != undefined){
+					const insert_reply_state = db.prepare("INSERT INTO TWEETS(user_id, content, is_reply) VALUES(?, ?, ?)")
+					insert_reply_state.run(row["id"], tweet_data["content"], tweet_id, (err, result) => {
+						if (err) {
+							console.log(err)
+							res.status(400).json({
+								"status": "err",
+								"message": err.message
+							})
+						}
+						console.log(insert_reply_state.lastID)
+						res.status(200).json({
+							"status": "ok",
+							"lastID": insert_reply_state.lastID
+						})
+					})
+				} else {
+					console.log("user authentification failed...")
+					res.status(200).json({
+						"status": "user authentification error",
+						"message": "user authentification failed..."
+					})
+				}
+			}
+		})
+	})
+}
+
+function select_tweet_reply(db, tweet_id, res){
+	// db.serialize いらないかも ... ?
+	db.all("SELECT * FROM TWEETS WHERE is_reply = ?;", tweet_id, (err, rows) => {
+		if (err) {
+			console.log(err)
+			res.status(400).json({
+				"status": "error",
+				"message": err.message
+			})
+		} else {
+			let reply_rows = []
+			rows.forEach(function(row){
+				let reply_row = {
+					"id": row["id"],
+					"content": row["content"],
+					"user_id": row["user_id"],
+					"is_retweet": row["is_retweet"],
+					"created_at": row["created_at"]
+				}
+				reply_rows.push(reply_row)
+			})
+			res.status(200).json({
+				"status": "ok",
+				"replys": reply_rows
+			})
+		}
+	})
+}
+
 // 複数カラム 関係 テスト用
 function get_tweets_from_user_email(db, user_data){
 	db.serialize(() => {
 		db.get("SELECT * FROM USERS WHERE email = ?", user_data["email"], (err, row) => {
-			db.get("SELECT * FROM TWEETS WHERE user_id = ?", row["id"], (err, t_row) => {
+			db.get("SELECT * FROM TWEETS WHERE user_id = ? AND is_reply = 0", row["id"], (err, t_row) => {
 				console.log(t_row)
 			})
 		})
@@ -605,7 +674,7 @@ function get_tweets_from_user_email(db, user_data){
 }
 
 function get_tweets_from_user_id(db, user_id){
-	db.all("SELECT * FROM TWEETS WHERE user_id = ?", user_id, (err, rows) => {
+	db.all("SELECT * FROM TWEETS WHERE user_id = ? AND is_reply = 0", user_id, (err, rows) => {
 		if (err) {
 			console.log(err)
 		} else {
@@ -719,7 +788,7 @@ function select_to_user_follow_by_user_id(db, user_id, res){
 			if (err) {
 				res.statu(400).json({
 					"status": "error",
-					"message": err
+					"message": err.message
 				})
 			} else {
 				let id_rows = ""
@@ -733,7 +802,7 @@ function select_to_user_follow_by_user_id(db, user_id, res){
 						console.log(err)
 						res.statu(400).json({
 							"status": "error",
-							"message": err
+							"message": err.message
 						})
 					} else {
 						let fixed_user_rows = []
@@ -742,7 +811,6 @@ function select_to_user_follow_by_user_id(db, user_id, res){
 								"id": user_row["id"],
 								"lastname": user_row["lastname"],
 								"firstname": user_row["firstname"],
-								"email": user_row["email"],
 								"description": user_row["description"],
 								"avatar_image_url": user_row["avatar_image_url"],
 								"created_at": user_row["created_at"]
@@ -766,7 +834,7 @@ function select_from_user_follow_by_user_id(db, user_id, res){
 			if (err) {
 				res.statu(400).json({
 					"status": "error",
-					"message": err
+					"message": err.message
 				})
 			} else {
 				let id_rows = ""
@@ -780,7 +848,7 @@ function select_from_user_follow_by_user_id(db, user_id, res){
 						console.log(err)
 						res.statu(400).json({
 							"status": "error",
-							"message": err
+							"message": err.message
 						})
 					} else {
 						let fixed_user_rows = []
@@ -789,7 +857,6 @@ function select_from_user_follow_by_user_id(db, user_id, res){
 								"id": user_row["id"],
 								"lastname": user_row["lastname"],
 								"firstname": user_row["firstname"],
-								"email": user_row["email"],
 								"description": user_row["description"],
 								"avatar_image_url": user_row["avatar_image_url"],
 								"created_at": user_row["created_at"]
@@ -815,7 +882,7 @@ function create_like(db, tweet_id, user_data, res){
 				console.log(err)
 				res.status(400).json({
 					"status": "error",
-					"message": err
+					"message": err.message
 				})
 			} else {
 				if (row != undefined){
@@ -826,7 +893,7 @@ function create_like(db, tweet_id, user_data, res){
 							console.log(err)
 							res.status(400).json({
 								"status": "error",
-								"message": err
+								"message": err.message
 							})
 						} else if ( l_row == undefined ) {
 							const insert_like_state = db.prepare("INSERT INTO LIKES(tweet_id, user_id) VALUES(?, ?)");
@@ -835,7 +902,7 @@ function create_like(db, tweet_id, user_data, res){
 									console.log(err)
 									res.status(400).json({
 										"status": "error",
-										"message": err
+										"message": err.message
 									})	
 								} else {
 									res.status(200).json({
@@ -871,7 +938,7 @@ function remove_like(db, tweet_id, user_data, res){
 				console.log(err)
 				res.statu(400).json({
 					"status": "error",
-					"message": err
+					"message": err.message
 				})
 			} else if (row != undefined){
 				const delete_like_state = db.prepare("DELETE FROM LIKES WHERE tweet_id = ? AND user_id = ?")
@@ -880,7 +947,7 @@ function remove_like(db, tweet_id, user_data, res){
 						console.log(err)
 						res.statu(400).json({
 							"status": "error",
-							"message": err
+							"message": err.message
 						})
 					} else {
 						console.log(delete_like_state.changes)
@@ -908,7 +975,7 @@ function select_all_likes(db, tweet_id, res){
 				console.log(err)
 				res.statu(400).json({
 					"status": "error",
-					"message": err
+					"message": err.message
 				})
 			} else {
 				let user_where_sql = ""
@@ -922,7 +989,7 @@ function select_all_likes(db, tweet_id, res){
 						console.log(err)
 						res.statu(400).json({
 							"status": "error",
-							"message": err
+							"message": err.message
 						})
 					} else {
 						let fixed_user_rows = []
@@ -967,6 +1034,9 @@ module.exports.select_id_tweet = select_id_tweet
 module.exports.create_tweet = create_tweet;
 module.exports.delete_tweet = delete_tweet;
 module.exports.get_tweets_from_user_id = get_tweets_from_user_id;
+// tweets reply
+module.exports.create_reply = create_reply;
+module.exports.select_tweet_reply = select_tweet_reply;
 // user_follow_relations
 module.exports.create_user_follow_relation = create_user_follow_relation;
 module.exports.remove_user_follow_relation = remove_user_follow_relation;

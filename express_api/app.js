@@ -212,6 +212,23 @@ app.get("/users/:id/tweets", cors(corsOptions), (req, res) => {
 	tweet_db.select_user_tweets(db, user_id, res)
 })
 
+app.post("/reply", cors(corsOptions), (req, res) => {
+	let user_data = {
+		"email": req.cookies["email"],
+		"cookietext": req.cookies["cookietext"]
+	}
+	let tweet_id = req.body.tweet_id
+	let tweet_data = {
+		"content": req.body.content
+	}
+	tweet_db.create_reply(db, tweet_data, tweet_id, user_data, res)
+})
+
+app.get("/tweets/:id/reply", cors(corsOptions), (req, res) => {
+	let tweet_id = req.params.id
+	tweet_db.select_tweet_reply(db, tweet_id, res)
+})
+
 // User follow relations
 app.post("/follow/:id", cors(corsOptions), (req, res) => {
 	let user_data = {
