@@ -11,6 +11,13 @@ function initialize_db(db_path){
 	return db
 }
 
+function return_error(err, res) {
+	res.status(400).json({
+		"status": "error",
+		"message": err.message
+	})
+}
+
 // Cookie 認証は、cookietext と id (res.cookieでフロント追加) で行う
 
 // [ Users Table ]
@@ -68,10 +75,7 @@ function select_all_user(db, res){
 		db.all("SELECT * FROM USERS;", [], (err, rows) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				let fixed_rows = []
 				rows.forEach(function(item){
@@ -100,10 +104,7 @@ function select_id_user(db, user_id, res){
 		db.get("SELECT * FROM USERS WHERE id = ?;", user_id, (err, row) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				if ( row != undefined) {
 					let fixed_row = {
@@ -135,10 +136,7 @@ function select_cookie_user(db, user_data, res){
 		db.get("SELECT * FROM USERS WHERE cookietext = ? AND email = ?", user_data["cookietext"], user_data["email"], (err, row) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				console.log(row)
 				if (row != undefined){
@@ -171,10 +169,7 @@ function create_user(db, user_data, res){
 	create_user_state.run(user_data["firstname"], user_data["lastname"], user_data["email"], user_data["password"], user_data["cookietext"], (err, result) => {
 		if (err) {
 			console.log(err);
-			res.status(400).json({
-				"status": "error",
-				"message": err.message
-			})
+			return_error(err, res)
 		} else {
 			console.log(create_user_state.lastID);
 			res.status(200).json({
@@ -195,10 +190,7 @@ function update_user_normal_data(db, user_data, user_id, res) {
 					update_user_state_normal.run(user_data["lastname"], user_data["firstname"], user_data["description"], row["id"], user_data["cookietext"], (err, result) => {
 						if (err) {
 							console.log(err)
-							res.status(400).json({
-								"status": "error",
-								"message": err.message
-							})
+							return_error(err, res)
 						} else {
 							console.log(update_user_state_normal.changes)
 							res.status(200).json({
@@ -230,10 +222,7 @@ function update_user_image_data(db, user_data, user_id, res){
 					update_user_state_normal.run(user_data["image_url"], row["id"], user_data["cookietext"], (err, result) => {
 						if (err) {
 							console.log(err)
-							res.status(400).json({
-								"status": "error",
-								"message": err.message
-							})
+							return_error(err, res)
 						} else {
 							console.log(update_user_state_normal.changes)
 							// res.status(200).json({
@@ -261,10 +250,7 @@ function update_user_password_data(db, user_data, new_user_data, user_id, res){
 	update_user_state_confidential.run(new_user_data["password"], user_data["email"], user_data["password"], user_id, (err, result) => {
 		if (err) {
 			console.log(err)
-			res.status(400).json({
-				"status": "error",
-				"message": err.message
-			})
+			return_error(err, res)
 		} else {
 			console.log(update_user_state_confidential.changes)
 			res.status(200).json({
@@ -284,10 +270,7 @@ function update_user_cookie_data(db, user_data, res) {
 		update_user_state_cookie.run(cookietext, user_data["email"], user_data["password"], (err, result) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				console.log(update_user_state_cookie.changes)
 				if ( update_user_state_cookie.changes == 1 ) {
@@ -308,10 +291,7 @@ function delete_user(db, user_data, user_id, res) {
 	delete_user_state.run(user_id, user_data["email"], user_data["password"], (err, result) => {
 		if (err) {
 			console.log(err)
-			res.status(400).json({
-				"status": "error",
-				"message": err.message
-			})
+			return_error(err, res)
 		} else {
 			console.log(delete_user_state.changes)
 			if (delete_user_state.changes == 1) {
@@ -371,18 +351,12 @@ function select_all_tweet(db, user_data, res) {
 						console.log(ufr_rows)
 						if (err) {
 							console.log(err)
-							res.status(400).json({
-								"status": "error",
-								"message": err.message
-							})
+							return_error(err, res)
 						} else if (ufr_rows == undefined) {
 							db.all("SELECT * FROM TWEETS WHERE user_id = ? AND is_reply = 0 ORDER BY created_at DESC;", row["id"], (err, rows) => {
 								if (err) {
 									console.log(err)
-									res.status(400).json({
-										"status": "error",
-										"message": err.message
-									})
+									return_error(err, res)
 								} else {
 									console.log(rows)
 									let fixed_rows = []
@@ -413,10 +387,7 @@ function select_all_tweet(db, user_data, res) {
 							db.all(select_tweets_where_ufr_state, (err, rows) => {
 								if (err) {
 									console.log(err)
-									res.status(400).json({
-										"status": "error",
-										"message": err.message
-									})
+									return_error(err, res)
 								} else {
 									console.log(rows)
 									let fixed_rows = []
@@ -455,10 +426,7 @@ function select_id_tweet(db, tweet_id, res){
 		db.get("SELECT * FROM TWEETS WHERE id = ?", tweet_id, (err, row) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				console.log(row)
 				if ( row != undefined ) {
@@ -488,10 +456,7 @@ function select_user_tweets(db, user_id, res){
 	db.all("SELECT * FROM TWEETS WHERE user_id = ? AND is_reply = 0 ORDER BY created_at DESC;", user_id, (err, rows) => {
 		if (err) {
 			console.log(err)
-			res.status(400).json({
-				"status": "error",
-				"message": err.message
-			})
+			return_error(err, res)
 		} else {
 			let fixed_rows = []
 			rows.forEach(function(row){
@@ -519,20 +484,14 @@ function create_tweet(db, tweet_data, user_data, res){
 		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, row) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				if (row != undefined) {
 					const create_tweet_state = db.prepare("INSERT INTO TWEETS(user_id, content) VALUES(?, ?);");
 					create_tweet_state.run(row["id"], tweet_data["content"], (err, result) => {
 						if (err) {
 							console.log(err)
-							res.status(400).json({
-								"status": "error",
-								"message": err.message
-							})
+							return_error(err, res)
 						} else {
 							console.log(create_tweet_state.lastID)
 							res.status(200).json({
@@ -560,20 +519,14 @@ function delete_tweet(db, tweet_data, user_data, res){
 		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, row) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				if (row != undefined) {
 					const delete_tweet_state = db.prepare("DELETE FROM TWEETS WHERE id = ? AND user_id = ?")
 					delete_tweet_state.run(tweet_data["id"], row["id"], (err, result) => {
 						if (err) {
 							console.log(err)
-							res.status(400).json({
-								"status": "error",
-								"message": err.message
-							})
+							return_error(err, res)
 						} else {
 							console.log(delete_tweet_state.changes)
 							res.status(200).json({
@@ -600,20 +553,14 @@ function create_reply(db, tweet_data, tweet_id, user_data, res){
 		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, row) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				if (row != undefined){
 					const insert_reply_state = db.prepare("INSERT INTO TWEETS(user_id, content, is_reply) VALUES(?, ?, ?)")
 					insert_reply_state.run(row["id"], tweet_data["content"], tweet_id, (err, result) => {
 						if (err) {
 							console.log(err)
-							res.status(400).json({
-								"status": "err",
-								"message": err.message
-							})
+							return_error(err, res)
 						}
 						console.log(insert_reply_state.lastID)
 						res.status(200).json({
@@ -638,10 +585,7 @@ function select_tweet_reply(db, tweet_id, res){
 	db.all("SELECT * FROM TWEETS WHERE is_reply = ?;", tweet_id, (err, rows) => {
 		if (err) {
 			console.log(err)
-			res.status(400).json({
-				"status": "error",
-				"message": err.message
-			})
+			return_error(err, res)
 		} else {
 			let reply_rows = []
 			rows.forEach(function(row){
@@ -659,6 +603,48 @@ function select_tweet_reply(db, tweet_id, res){
 				"replys": reply_rows
 			})
 		}
+	})
+}
+
+// Retweet
+function create_retweet(db, tweet_id, user_data, res){
+	db.serialize(() => {
+		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, user_row) => {
+			if (err) {
+				console.log(err)
+				return_error(err, res)
+			} else if ( user_row != undefined ) {
+				db.get("SELECT * FROM TWEETS WHERE id = ?", tweet_id, (err, t_row) => {
+					if (err) {
+						console.log(err)
+						return_error(err, res)
+					} else if (t_row == undefined) {
+						res.status(200).json({
+							"status": "tweet not found error",
+							"message": "tweet not found."
+						})
+					} else {
+						const insert_retweet_state = db.prepare("INSERT INTO TWEETS(content, user_id, is_retweet) VALUES(?, ?, ?);")
+						insert_retweet_state.run(t_row["content"], user_row["id"], tweet_id, (err, result) => {
+							if (err) {
+								return_error(err, res)
+							} else {
+								res.status(200).json({
+									"status": "ok",
+									"lastID": insert_retweet_state.lastID
+								})
+							}
+						})
+					}
+				})
+			} else {
+				console.log("user authentification error")
+				res.status(200).json({
+					"status": "error",
+					"message": "user authentification failed."
+				})
+			}
+		})
 	})
 }
 
@@ -690,10 +676,7 @@ function create_user_follow_relation(db, user_id, user_data, res){
 		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, user_row) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else if (user_row == undefined) {
 				console.log("User not login.")
 				res.status(200).json({
@@ -710,10 +693,7 @@ function create_user_follow_relation(db, user_id, user_data, res){
 				db.get("SELECT * FROM USER_FOLLOW_RELATIONS WHERE from_user_id = ? AND to_user_id = ?;", user_row["id"], user_id, (err, ufr_row) => {
 					if (err) {
 						console.log(err)
-						res.status(400).json({
-							"status": "error",
-							"message": err.message
-						})
+						return_error(err, res)
 					} else {
 						if (ufr_row != undefined) {
 							res.status(200).json({
@@ -725,10 +705,7 @@ function create_user_follow_relation(db, user_id, user_data, res){
 							create_user_follow_state.run(user_id, user_row["id"], (err, result) => {
 								if (err){
 									console.log(err)
-									res.status(400).json({
-										"status": "error",
-										"message": err.message
-									})
+									return_error(err, res)
 								} else {
 									console.log(create_user_follow_state.lastID)
 									res.status(200).json({
@@ -750,10 +727,7 @@ function remove_user_follow_relation(db, user_id, user_data, res){
 		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, user_row) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				if (user_row == undefined) {
 					res.status(200).json({
@@ -764,10 +738,7 @@ function remove_user_follow_relation(db, user_id, user_data, res){
 					let delete_user_follow_state = db.prepare("DELETE FROM USER_FOLLOW_RELATIONS WHERE to_user_id = ? AND from_user_id = ?;")
 					delete_user_follow_state.run(user_id, user_row["id"], (err, result) => {
 						if (err) {
-							res.status(400).json({
-								"status": "error",
-								"message": err.message
-							})
+							return_error(err, res)
 						} else {
 							console.log(delete_user_follow_state.changes)
 							res.status(200).json({
@@ -786,10 +757,7 @@ function select_to_user_follow_by_user_id(db, user_id, res){
 	db.serialize(() => {
 		db.all("SELECT * FROM USER_FOLLOW_RELATIONS WHERE to_user_id = ?", user_id, (err, rows) => {
 			if (err) {
-				res.statu(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				let id_rows = ""
 				rows.forEach(function(row){
@@ -800,10 +768,7 @@ function select_to_user_follow_by_user_id(db, user_id, res){
 				db.all(select_all_user_state, (err, user_rows) => {
 					if (err) {
 						console.log(err)
-						res.statu(400).json({
-							"status": "error",
-							"message": err.message
-						})
+						return_error(err, res)
 					} else {
 						let fixed_user_rows = []
 						user_rows.forEach(function(user_row){
@@ -832,10 +797,7 @@ function select_from_user_follow_by_user_id(db, user_id, res){
 	db.serialize(() => {
 		db.all("SELECT * FROM USER_FOLLOW_RELATIONS WHERE from_user_id = ?", user_id, (err, rows) => {
 			if (err) {
-				res.statu(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				let id_rows = ""
 				rows.forEach(function(row){
@@ -846,10 +808,7 @@ function select_from_user_follow_by_user_id(db, user_id, res){
 				db.all(select_all_user_state, (err, user_rows) => {
 					if (err) {
 						console.log(err)
-						res.statu(400).json({
-							"status": "error",
-							"message": err.message
-						})
+						return_error(err, res)
 					} else {
 						let fixed_user_rows = []
 						user_rows.forEach(function(user_row){
@@ -880,10 +839,7 @@ function create_like(db, tweet_id, user_data, res){
 		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?;", user_data["email"], user_data["cookietext"], (err, row) => {
 			if (err) {
 				console.log(err)
-				res.status(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				if (row != undefined){
 					//
@@ -891,19 +847,13 @@ function create_like(db, tweet_id, user_data, res){
 					db.get(check_like_state, tweet_id, row["id"], (err, l_row) => {
 						if (err) {
 							console.log(err)
-							res.status(400).json({
-								"status": "error",
-								"message": err.message
-							})
+							return_error(err, res)
 						} else if ( l_row == undefined ) {
 							const insert_like_state = db.prepare("INSERT INTO LIKES(tweet_id, user_id) VALUES(?, ?)");
 							insert_like_state.run(tweet_id, row["id"], (err, result) => {
 								if (err) {
 									console.log(err)
-									res.status(400).json({
-										"status": "error",
-										"message": err.message
-									})	
+									return_error(err, res)
 								} else {
 									res.status(200).json({
 										"status": "ok",
@@ -936,19 +886,13 @@ function remove_like(db, tweet_id, user_data, res){
 		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?", user_data["email"], user_data["cookietext"], (err, row) => {
 			if (err) {
 				console.log(err)
-				res.statu(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else if (row != undefined){
 				const delete_like_state = db.prepare("DELETE FROM LIKES WHERE tweet_id = ? AND user_id = ?")
 				delete_like_state.run(tweet_id, row["id"], (err, result) => {
 					if (err) {
 						console.log(err)
-						res.statu(400).json({
-							"status": "error",
-							"message": err.message
-						})
+						return_error(err, res)
 					} else {
 						console.log(delete_like_state.changes)
 						res.status(200).json({
@@ -973,10 +917,7 @@ function select_all_likes(db, tweet_id, res){
 		db.all("SELECT * FROM LIKES WHERE tweet_id = ?", tweet_id, (err, rows) => {
 			if (err) {
 				console.log(err)
-				res.statu(400).json({
-					"status": "error",
-					"message": err.message
-				})
+				return_error(err, res)
 			} else {
 				let user_where_sql = ""
 				rows.forEach(function(row) {
@@ -987,10 +928,7 @@ function select_all_likes(db, tweet_id, res){
 				db.all(select_user_state, (err, user_rows) => {
 					if (err) {
 						console.log(err)
-						res.statu(400).json({
-							"status": "error",
-							"message": err.message
-						})
+						return_error(err, res)
 					} else {
 						let fixed_user_rows = []
 						user_rows.forEach(function(user_row){
@@ -1046,3 +984,8 @@ module.exports.select_from_user_follow_by_user_id = select_from_user_follow_by_u
 module.exports.create_like = create_like;
 module.exports.remove_like = remove_like;
 module.exports.select_all_likes = select_all_likes;
+// Retweet
+module.exports.create_retweet = create_retweet;
+
+
+

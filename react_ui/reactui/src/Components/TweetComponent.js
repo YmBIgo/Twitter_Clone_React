@@ -10,6 +10,7 @@ const TweetComponent = (props) => {
 
 	const [tweet, setTweet] = useState({});
 	const [user, setUser] = useState({});
+	const [retweetUser, setRetweetUser] = useState({});
 	const [currentUser, setCurrentUser] = useState({});
 	const [like, setLike] = useState([])
 	const useeffect_counter = 0;
@@ -27,13 +28,36 @@ const TweetComponent = (props) => {
 			console.log(response["data"]["tweet"])
 			setTweet(response["data"]["tweet"])
 			// ユーザー情報
-			let tweet_user_info_api_url = "http://localhost:3002/users/" + response["data"]["tweet"]["user_id"]
-			axios({
-				method: "GET",
-				url: tweet_user_info_api_url
-			}).then((response1) => {
-				setUser(response1["data"]["user"]);
-			})
+			let tweet_user_info_api_url = "";
+			if ( response["data"]["tweet"]["is_retweet"] == 0 ) {
+				tweet_user_info_api_url = "http://localhost:3002/users/" + response["data"]["tweet"]["user_id"]
+				axios({
+					method: "GET",
+					url: tweet_user_info_api_url
+				}).then((response1) => {
+					setUser(response1["data"]["user"]);
+				})
+			} else {
+				axios({
+					method: "GET",
+					url: "http://localhost:3002/tweets/" + response["data"]["tweet"]["is_retweet"]
+				}).then((tw_response) => {
+					tweet_user_info_api_url = "http://localhost:3002/users/" + tw_response["data"]["tweet"]["user_id"]
+					axios({
+						method: "GET",
+						url: "http://localhost:3002/users/" + response["data"]["tweet"]["user_id"]
+					}).then((retweet_response) => {
+						setRetweetUser(retweet_response["data"]["user"])
+					})
+					axios({
+						method: "GET",
+						url: tweet_user_info_api_url
+					}).then((response1) => {
+						setUser(response1["data"]["user"]);
+					})
+				})
+				console.log(tweet_user_info_api_url)
+			}
 			// サインインユーザー情報
 			let signed_in_user_api_url = "http://localhost:3002/signed_in_user"
 			axios({
@@ -140,6 +164,11 @@ const TweetComponent = (props) => {
 	return(
 		<>
 			<div className="tweetcard">
+				{ tweet["is_retweet"] != 0 &&
+					<p>
+						{retweetUser.lastname} {retweetUser.firstname} さんが、リツイートしました。
+					</p>
+				}
 				<div className="tweetcard-title row">
 					<div className="col-2">
 						{ user["avatar_image_url"] == "" &&
