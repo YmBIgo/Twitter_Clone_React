@@ -2,6 +2,23 @@
 
 1 : Express で API サーバーをたてる
 
+	一：Sqliteファイル作成
+
+	Sqlitebrowser (ダウンロードはhttps://sqlitebrowser.org/dl/から) で、「新しいデータベース(N)」から "express_api/db/express_api.db" にデータベースを作成。
+
+	二：データベース作成
+
+	‘‘‘
+	cd express_api
+	node ./lib/db_table/db_version1.js
+	....
+	node ./lib/db_table/db_version4.js
+	‘‘‘
+
+	までで データベース を作成。
+
+	三：以下のコマンドで、サーバーをたてる。
+
 	‘‘‘
 	cd express_api
 	node app.js
@@ -24,3 +41,4 @@
 
 3 : 未実装
 	A : メッセージ機能
+	B : リツイート機能
