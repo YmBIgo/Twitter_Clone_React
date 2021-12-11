@@ -239,6 +239,18 @@ app.post("/retweet", cors(corsOptions), (req, res) => {
 	let tweet_id = req.body.tweet_id
 	tweet_db.create_retweet(db, tweet_id, user_data, res)
 })
+app.get("/tweets/:id/retweet", cors(corsOptions), (req, res) => {
+	let tweet_id = req.params.id
+	tweet_db.select_retweet_from_tweet(db, tweet_id, res)
+})
+app.post("/tweets/:id/cancel_retweet", cors(corsOptions), (req, res) => {
+	let user_data = {
+		"email": req.cookies["email"],
+		"cookietext": req.cookies["cookietext"]
+	}
+	let tweet_id = req.params.id
+	tweet_db.delete_retweet_from_tweet(db, tweet_id, user_data, res)
+})
 
 // User follow relations
 app.post("/follow/:id", cors(corsOptions), (req, res) => {

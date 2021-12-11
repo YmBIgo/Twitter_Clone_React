@@ -147,12 +147,21 @@
 			</form>
 		</div>
 		<div class="col-6">
+		</div>
+		<div class="col-6">
 			<br>
 			<h3>Tweet Retweet</h3>
 			<form action="http://localhost:3002/retweet" method="POST">
 				<label>Tweet ID</label>
 				<input type="number" name="tweet_id" value="8">
 				<br>
+				<button>Send</button>
+			</form>
+		</div>
+		<div class="col-6">
+			<br>
+			<h3>Tweet Retweet [ID 29]</h3>
+			<form action="http://localhost:3002/tweets/29/cancel_retweet" method="POST">
 				<button>Send</button>
 			</form>
 		</div>

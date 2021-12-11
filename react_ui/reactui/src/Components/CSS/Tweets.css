@@ -36,6 +36,17 @@
 	margin:10px 0;
 }
 /* Like */
+.tweetcard-like-content{
+	display:inline-block;
+}
+.like-section{
+	display:inline-block;
+	width:200px;
+}
+.no-like-section{
+	display:inline-block;
+	width:200px;
+}
 .like-row{
 	margin:3px 0;
 }
@@ -70,12 +81,34 @@
 .reply-img{
 	width:20px;
 	height:20px;
-	margin-left:10%;
+	margin-left:15%;
 }
 .no-like-reply-length{
 }
 .no-like-reply-img{
 	width:20px;
 	height:20px;
-	margin-left:10%;
+	margin-left:15%;
+}
+/* Retweet */
+.retweet-section{
+	display:inline-block;
+}
+.retweet-img{
+	height:20px;
+	width:30px;
+}
+.no-retweet-img{
+	height:20px;
+	width:25px;
+	padding: 0 2px;
+}
+.retweet-content{
+	display:inline-block;
+}
+.no-retweet-content{
+	display:inline-block;
+}
+.hidden-retweet{
+	display:none;
 }

@@ -648,6 +648,59 @@ function create_retweet(db, tweet_id, user_data, res){
 	})
 }
 
+function select_retweet_from_tweet(db, tweet_id, res){
+	db.serialize(() => {
+		db.all("SELECT * FROM TWEETS WHERE is_retweet = ?", tweet_id, (err, rows) => {
+			if (err) {
+				console.log(err)
+				return_error(err, res)
+			} else if ( rows == undefined ) {
+				res.status(200).json({
+					"status": "ok",
+					"retweets": []
+				})
+			} else {
+				let fixed_tweets = []
+				rows.forEach(function(row){
+					fixed_tweets.push(row["id"])
+				})
+				res.status(200).json({
+					"status": "ok",
+					"retweets": fixed_tweets
+				})
+			}
+		})
+	})
+}
+
+function delete_retweet_from_tweet(db, tweet_id, user_data, res){
+	db.serialize(() => {
+		db.get("SELECT * FROM USERS WHERE email = ? AND cookietext = ?", user_data["email"], user_data["cookietext"], (err, row) => {
+			if (err) {
+				return_error(err, res)
+			} else if ( row != undefined ) {
+				const delete_retweet_state = db.prepare("DELETE FROM TWEETS WHERE user_id = ? AND is_retweet = ?;")
+				delete_retweet_state.run(row["id"], tweet_id, (err, result) => {
+					if (err) {
+						return_error(err, res)
+					} else {
+						res.status(200).json({
+							"status": "ok",
+							"changes": delete_retweet_state.changes
+						})
+					}
+				})
+			} else {
+				console.log("user authentification error")
+				res.status(200).json({
+					"status": "error",
+					"message": "user authentification failed."
+				})
+			}
+		})
+	})
+}
+
 // 複数カラム 関係 テスト用
 function get_tweets_from_user_email(db, user_data){
 	db.serialize(() => {
@@ -972,9 +1025,13 @@ module.exports.select_id_tweet = select_id_tweet
 module.exports.create_tweet = create_tweet;
 module.exports.delete_tweet = delete_tweet;
 module.exports.get_tweets_from_user_id = get_tweets_from_user_id;
-// tweets reply
+// Tweets Reply
 module.exports.create_reply = create_reply;
 module.exports.select_tweet_reply = select_tweet_reply;
+// Tweets Retweet
+module.exports.create_retweet = create_retweet;
+module.exports.select_retweet_from_tweet = select_retweet_from_tweet;
+module.exports.delete_retweet_from_tweet = delete_retweet_from_tweet;
 // user_follow_relations
 module.exports.create_user_follow_relation = create_user_follow_relation;
 module.exports.remove_user_follow_relation = remove_user_follow_relation;
@@ -984,8 +1041,6 @@ module.exports.select_from_user_follow_by_user_id = select_from_user_follow_by_u
 module.exports.create_like = create_like;
 module.exports.remove_like = remove_like;
 module.exports.select_all_likes = select_all_likes;
-// Retweet
-module.exports.create_retweet = create_retweet;
 
 
 
