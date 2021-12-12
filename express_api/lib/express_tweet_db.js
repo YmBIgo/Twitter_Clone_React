@@ -624,8 +624,22 @@ function create_retweet(db, tweet_id, user_data, res){
 							"message": "tweet not found."
 						})
 					} else {
+						let retweet_tweet_id = tweet_id
+						if ( t_row["is_retweet"] != 0 ) {
+							const select_original_retweet_state = "SELECT * FROM TWEETS WHERE id = ?;"
+							db.run(select_original_retweet_state, t_row["is_retweet"], (error, rt_row) => {
+								if (err) {
+									console.log(err)
+									return_error(err, res)
+								} else if (rt_row == undefined) {
+								} else {
+									retweet_tweet_id = rt_row["id"]
+								}
+							})
+						}
+						//
 						const insert_retweet_state = db.prepare("INSERT INTO TWEETS(content, user_id, is_retweet) VALUES(?, ?, ?);")
-						insert_retweet_state.run(t_row["content"], user_row["id"], tweet_id, (err, result) => {
+						insert_retweet_state.run(t_row["content"], user_row["id"], retweet_tweet_id, (err, result) => {
 							if (err) {
 								return_error(err, res)
 							} else {
