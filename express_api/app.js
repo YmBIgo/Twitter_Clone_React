@@ -251,6 +251,10 @@ app.post("/tweets/:id/cancel_retweet", cors(corsOptions), (req, res) => {
 	let tweet_id = req.params.id
 	tweet_db.delete_retweet_from_tweet(db, tweet_id, user_data, res)
 })
+app.get("/tweets/:id/original_retweet", cors(corsOptions), (req, res) => {
+	let tweet_id = req.params.id
+	tweet_db.select_original_retweet(db, tweet_id, res)
+})
 
 // User follow relations
 app.post("/follow/:id", cors(corsOptions), (req, res) => {

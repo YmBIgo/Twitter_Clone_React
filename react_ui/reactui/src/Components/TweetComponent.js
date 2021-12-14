@@ -13,6 +13,7 @@ const TweetComponent = (props) => {
 	const [tweet, setTweet] = useState({});
 	const [user, setUser] = useState({});
 	const [retweetUser, setRetweetUser] = useState({});
+	const [retweetID, setRetweetID] = useState(0);
 	const [currentUser, setCurrentUser] = useState({});
 	const [like, setLike] = useState([])
 	const useeffect_counter = 0;
@@ -100,19 +101,26 @@ const TweetComponent = (props) => {
 					}
 				})
 				// Retweet
-				let retweet_api_url = "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/retweet"
 				axios({
 					method: "GET",
-					url: retweet_api_url
-				}).then((response4) => {
-					let retweet_array = response4["data"]["retweets"]
-					document.getElementsByClassName("retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
-					document.getElementsByClassName("no-retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
-					if (retweet_array.length == 0) {
-						document.getElementsByClassName("retweet-content")[props.t_index].classList.add("hidden-retweet")
-					} else {
-						document.getElementsByClassName("no-retweet-content")[props.t_index].classList.add("hidden-retweet")
-					}
+					url: "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/original_retweet"
+				}).then((response) => {
+					setRetweetID(response["data"]["lastID"])
+					// let retweet_api_url = "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/retweet"
+					let retweet_api_url = "http://localhost:3002/tweets/" + response["data"]["lastID"] + "/retweet"
+					axios({
+						method: "GET",
+						url: retweet_api_url
+					}).then((response4) => {
+						let retweet_array = response4["data"]["retweets"]
+						document.getElementsByClassName("retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
+						document.getElementsByClassName("no-retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
+						if (retweet_array.length == 0) {
+							document.getElementsByClassName("retweet-content")[props.t_index].classList.add("hidden-retweet")
+						} else {
+							document.getElementsByClassName("no-retweet-content")[props.t_index].classList.add("hidden-retweet")
+						}
+					})
 				})
 			})
 			// Reply
@@ -179,7 +187,8 @@ const TweetComponent = (props) => {
 		})
 	}
 
-	const retweet_tweet = (tweet_id, index) => {
+	const retweet_tweet = (index) => {
+		let tweet_id = retweetID
 		document.getElementsByClassName("retweet-content")[index].classList.remove("hidden-retweet");
 		document.getElementsByClassName("no-retweet-content")[index].classList.add("hidden-retweet");
 		axios({
@@ -188,11 +197,13 @@ const TweetComponent = (props) => {
 			data: {tweet_id: tweet_id},
 			withCredentials: true
 		}).then((response) => {
-			get_current_retweet_status(tweet_id, index)
+			get_current_retweet_status(index)
 		})
 	}
 
-	const cancel_retweet_tweet = (tweet_id, index) => {
+	const cancel_retweet_tweet = (index) => {
+		let tweet_id = retweetID
+		console.log(tweet_id)
 		document.getElementsByClassName("retweet-content")[index].classList.add("hidden-retweet");
 		document.getElementsByClassName("no-retweet-content")[index].classList.remove("hidden-retweet");
 		axios({
@@ -200,11 +211,12 @@ const TweetComponent = (props) => {
 			url: "http://localhost:3002/tweets/" + tweet_id + "/cancel_retweet",
 			withCredentials: true
 		}).then((response) => {
-			get_current_retweet_status(tweet_id, index)
+			get_current_retweet_status(index)
 		})
 	}
 
-	const get_current_retweet_status = (tweet_id, index) => {
+	const get_current_retweet_status = (index) => {
+		let tweet_id = retweetID
 		let current_retweet_api_url = "http://localhost:3002/tweets/" + tweet_id + "/retweet"
 		axios({
 			method: "GET",
@@ -276,11 +288,11 @@ const TweetComponent = (props) => {
 								<div className="retweet-section">
 									<div className="retweet-row">
 										<div className="retweet-content">
-											<img src={retweet_normal} className="retweet-img" onClick={() => cancel_retweet_tweet(tweet.id, props.t_index)} />
+											<img src={retweet_normal} className="retweet-img" onClick={() => cancel_retweet_tweet(props.t_index)} />
 											<span className="retweet-length">0</span>
 										</div>
 										<div className="no-retweet-content">
-											<img src={retweet_dark} className="no-retweet-img" onClick={() => retweet_tweet(tweet.id, props.t_index)} />
+											<img src={retweet_dark} className="no-retweet-img" onClick={() => retweet_tweet(props.t_index)} />
 											<span className="no-retweet-length">0</span>
 										</div>
 									</div>

@@ -624,30 +624,31 @@ function create_retweet(db, tweet_id, user_data, res){
 							"message": "tweet not found."
 						})
 					} else {
-						let retweet_tweet_id = tweet_id
-						if ( t_row["is_retweet"] != 0 ) {
-							const select_original_retweet_state = "SELECT * FROM TWEETS WHERE id = ?;"
-							db.run(select_original_retweet_state, t_row["is_retweet"], (error, rt_row) => {
+						let retweet_tweet_id = tweet_id;
+						const select_original_retweet_state = "SELECT * FROM TWEETS WHERE id = ?;"
+						db.get(select_original_retweet_state, t_row["is_retweet"], (error, rt_row) => {
+							if (err) {
+								console.log(err)
+								return_error(err, res)
+							} else if ( t_row["is_retweet"] == 0 ) {
+								retweet_tweet_id = tweet_id
+							} else if (rt_row == undefined) {
+								retweet_tweet_id = tweet_id
+							} else {
+								retweet_tweet_id = rt_row["id"]
+							}
+							//
+							const insert_retweet_state = db.prepare("INSERT INTO TWEETS(content, user_id, is_retweet) VALUES(?, ?, ?);")
+							insert_retweet_state.run(t_row["content"], user_row["id"], retweet_tweet_id, (err, result) => {
 								if (err) {
-									console.log(err)
 									return_error(err, res)
-								} else if (rt_row == undefined) {
 								} else {
-									retweet_tweet_id = rt_row["id"]
+									res.status(200).json({
+										"status": "ok",
+										"lastID": insert_retweet_state.lastID
+									})
 								}
 							})
-						}
-						//
-						const insert_retweet_state = db.prepare("INSERT INTO TWEETS(content, user_id, is_retweet) VALUES(?, ?, ?);")
-						insert_retweet_state.run(t_row["content"], user_row["id"], retweet_tweet_id, (err, result) => {
-							if (err) {
-								return_error(err, res)
-							} else {
-								res.status(200).json({
-									"status": "ok",
-									"lastID": insert_retweet_state.lastID
-								})
-							}
 						})
 					}
 				})
@@ -710,6 +711,47 @@ function delete_retweet_from_tweet(db, tweet_id, user_data, res){
 					"status": "error",
 					"message": "user authentification failed."
 				})
+			}
+		})
+	})
+}
+
+function select_original_retweet(db, retweet_id, res){
+	db.serialize(() => {
+		db.get("SELECT * FROM TWEETS WHERE id = ?;", retweet_id, (err, row) => {
+			if (err) {
+				return_error(err, res)
+			} else {
+				if (row == undefined) {
+					res.status(200).json({
+						"status": "ok",
+						"lastID": 0
+					})
+				} else {
+					let original_retweet_id = row["is_retweet"]
+					let original_tweet_id = row["id"]
+					let while_counter = 0
+					if (original_retweet_id != 0){
+						db.get("SELECT * FROM TWEETS WHERE id = ?", original_retweet_id, (err, t_row) => {
+							if (err) {
+								return_error(err, res)
+							} else {
+								original_retweet_id = t_row["is_retweet"]
+								original_tweet_id = t_row["id"]
+								console.log(t_row["id"])
+								res.status(200).json({
+									"status": "ok",
+									"lastID": original_tweet_id
+								})
+							}
+						})
+					} else {
+						res.status(200).json({
+							"status": "ok",
+							"lastID": original_tweet_id
+						})
+					}
+				}
 			}
 		})
 	})
@@ -1046,6 +1088,7 @@ module.exports.select_tweet_reply = select_tweet_reply;
 module.exports.create_retweet = create_retweet;
 module.exports.select_retweet_from_tweet = select_retweet_from_tweet;
 module.exports.delete_retweet_from_tweet = delete_retweet_from_tweet;
+module.exports.select_original_retweet = select_original_retweet;
 // user_follow_relations
 module.exports.create_user_follow_relation = create_user_follow_relation;
 module.exports.remove_user_follow_relation = remove_user_follow_relation;
