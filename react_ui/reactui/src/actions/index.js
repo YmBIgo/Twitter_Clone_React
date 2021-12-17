@@ -1,7 +1,12 @@
 import axios from "axios"
+
 export const GET_TWEET_SUCCESS = "GET_TWEET_SUCCESS"
 export const GET_TWEET_FAIL = "GET_TWEET_FAIL"
+export const GET_CURRENT_USER_SUCCESS = "GET_CURRENT_USER_SUCCESS"
+export const GET_CURRENT_USER_FAIL = "GET_CURRENT_USER_FAIL"
+export const GET_CURRENT_USER_DATA = "GET_CURRENT_USER_DATA"
 
+// Tweets
 export const getTweet = () => {
 
 	return (dispatch) => {
@@ -22,6 +27,8 @@ export const getTweet = () => {
 			} else {
 				//
 			}
+		}).catch((err) => {
+			dispatch(getTweetFail(err))
 		})
 	}
 }
@@ -37,5 +44,45 @@ const getTweetFail = (error) => {
 	return {
 		type: GET_TWEET_FAIL,
 		error: error,
+	}
+}
+
+// Current User
+export const getCurrentUser = () => {
+	return (dispatch) => {
+		axios({
+			method: "GET",
+			url: "http://localhost:3002/signed_in_user",
+			withCredentials: true
+		}).then((response) => {
+			let res_status = response["data"]["status"]
+			if (res_status == "ok") {
+				dispatch(getCurrentUserSuccess(response["data"]["user"]))
+			} else if (res_status == "user not signed in error") {
+				dispatch(getCurrentUserFail("user not signed in error"))
+			}
+		}).catch((err) => {
+			dispatch(getCurrentUserFail(err))
+		})
+	}
+}
+
+const getCurrentUserSuccess = currentuser => {
+	return{
+		type: GET_CURRENT_USER_SUCCESS,
+		currentuser: currentuser
+	}
+}
+
+const getCurrentUserFail = (error) => {
+	return {
+		type: GET_CURRENT_USER_FAIL,
+		error: error,
+	}
+}
+
+export const getCurrentUserData = () => {
+	return {
+		type: GET_CURRENT_USER_DATA
 	}
 }

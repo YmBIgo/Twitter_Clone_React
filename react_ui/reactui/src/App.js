@@ -3,6 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Link, Routes, Route } from 'react-router-dom';
 import {useState, useEffect} from "react";
 import axios from "axios";
+import {useDispatch, useSelector} from "react-redux"
+
 import Users from "./Components/Users"
 import User from "./Components/User"
 import UserEdit from "./Components/UserEdit"
@@ -13,7 +15,18 @@ import TweetNew from "./Components/TweetNew"
 import Follow from "./Components/Follow"
 import Following from "./Components/Following"
 
+import {getCurrentUser} from "./actions"
+
 function App() {
+
+  const useeffect_counter = 0
+  const dispatch = useDispatch();
+  const currentuser = useSelector(state => state.currentuser)
+
+  useEffect(() => {
+    dispatch(getCurrentUser())
+    console.log(currentuser)
+  }, [useeffect_counter])
 
   return (
     <BrowserRouter>

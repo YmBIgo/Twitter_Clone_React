@@ -130,7 +130,7 @@ function select_id_user(db, user_id, res){
 	})
 }
 
-// たぶん、いらない？
+// 
 function select_cookie_user(db, user_data, res){
 	db.serialize(() => {
 		db.get("SELECT * FROM USERS WHERE cookietext = ? AND email = ?", user_data["cookietext"], user_data["email"], (err, row) => {

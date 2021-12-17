@@ -20,7 +20,7 @@ const UserComponent = (props) => {
 			method: "GET",
 			url: user_api_url
 		}).then((response) => {
-			console.log(response["data"]["user"])
+			// console.log(response["data"]["user"])
 			setUser(response["data"]["user"])
 			if ( user != undefined ){
 			// current user
