@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react"
 import axios from "axios";
 import { Link } from "react-router-dom"
+import {useDispatch, useSelector} from "react-redux"
+
+import {getCurrentUserData} from "../actions"
 import "./CSS/Tweets.css"
 import heart_dark from "./IMG/heart_dark.svg"
 import heart_normal from "./IMG/heart_normal.jpg"
@@ -14,9 +17,11 @@ const TweetComponent = (props) => {
 	const [user, setUser] = useState({});
 	const [retweetUser, setRetweetUser] = useState({});
 	const [retweetID, setRetweetID] = useState(0);
-	const [currentUser, setCurrentUser] = useState({});
 	const [like, setLike] = useState([])
 	const useeffect_counter = 0;
+
+	const dispatch = useDispatch()
+	const currentuser = useSelector(state => state.currentuser)
 
 	useEffect(() => {
 		get_tweet_data()
@@ -60,63 +65,49 @@ const TweetComponent = (props) => {
 				})
 				console.log(tweet_user_info_api_url)
 			}
-			// サインインユーザー情報
-			let signed_in_user_api_url = "http://localhost:3002/signed_in_user"
+			// いいね
+			let like_api_url = "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/like"
 			axios({
 				method: "GET",
-				url: signed_in_user_api_url,
-				withCredentials: true
-			}).then((response2) => {
-				// 書き方が渋い
-				if ( response2["data"]["user"] != undefined ){
-					setCurrentUser(response2["data"]["user"])
-				} else {
-					setCurrentUser({"id":0})
-				}
-				// いいね
-				let like_api_url = "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/like"
-				axios({
-					method: "GET",
-					url: like_api_url
-				}).then((response3) => {
-					setLike(response3["data"]["users"])
-					let user_like = []
-					response3["data"]["users"].forEach(function(item){
-						user_like.push(item["id"])
-					})
-					if ( user_like.includes(response2["data"]["user"]["id"]) == false ) {
-						document.getElementsByClassName("like-section")[props.t_index].classList.add("hidden-like");
-						// document.getElementsByClassName("no-like-section")[0].classList.add("show-like");
-						document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length + "Likes";
-						document.getElementsByClassName("no-like-length")[props.t_index].innerText = user_like.length + "Likes";
-					} else if ( user_like.includes(response2["data"]["user"]["id"]) == true ) {
-						document.getElementsByClassName("no-like-section")[props.t_index].classList.add("hidden-like");
-						// document.getElementsByClassName("no-like-section")[0].classList.add("show-like");
-						document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length + "Likes";
-						document.getElementsByClassName("no-like-length")[props.t_index].innerText = user_like.length + "Likes";
-					}
+				url: like_api_url
+			}).then((response3) => {
+				setLike(response3["data"]["users"])
+				let user_like = []
+				response3["data"]["users"].forEach(function(item){
+					user_like.push(item["id"])
 				})
-				// Retweet
+				if ( user_like.includes(currentuser["id"]) == false ) {
+					document.getElementsByClassName("like-section")[props.t_index].classList.add("hidden-like");
+					// document.getElementsByClassName("no-like-section")[0].classList.add("show-like");
+					document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length + "Likes";
+					document.getElementsByClassName("no-like-length")[props.t_index].innerText = user_like.length + "Likes";
+				} else if ( user_like.includes(currentuser["id"]) == true ) {
+					document.getElementsByClassName("no-like-section")[props.t_index].classList.add("hidden-like");
+					// document.getElementsByClassName("no-like-section")[0].classList.add("show-like");
+					document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length + "Likes";
+					document.getElementsByClassName("no-like-length")[props.t_index].innerText = user_like.length + "Likes";
+				}
+			})
+			// Retweet
+			axios({
+				method: "GET",
+				url: "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/original_retweet"
+			}).then((response) => {
+				setRetweetID(response["data"]["lastID"])
+				let retweet_api_url = "http://localhost:3002/tweets/" + response["data"]["lastID"] + "/retweet"
 				axios({
 					method: "GET",
-					url: "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/original_retweet"
-				}).then((response) => {
-					setRetweetID(response["data"]["lastID"])
-					let retweet_api_url = "http://localhost:3002/tweets/" + response["data"]["lastID"] + "/retweet"
-					axios({
-						method: "GET",
-						url: retweet_api_url
-					}).then((response4) => {
-						let retweet_array = response4["data"]["retweets"]
-						document.getElementsByClassName("retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
-						document.getElementsByClassName("no-retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
-						// いい書き方がないか ...
-						if (retweet_array.length == 0) {
-							document.getElementsByClassName("retweet-content")[props.t_index].classList.add("hidden-retweet")
-						} else {
-							document.getElementsByClassName("no-retweet-content")[props.t_index].classList.add("hidden-retweet")
-						}
-					})
+					url: retweet_api_url
+				}).then((response4) => {
+					let retweet_array = response4["data"]["retweets"]
+					document.getElementsByClassName("retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
+					document.getElementsByClassName("no-retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
+					// いい書き方がないか ...
+					if (retweet_array.length == 0) {
+						document.getElementsByClassName("retweet-content")[props.t_index].classList.add("hidden-retweet")
+					} else {
+						document.getElementsByClassName("no-retweet-content")[props.t_index].classList.add("hidden-retweet")
+					}
 				})
 			})
 			// Reply
@@ -294,7 +285,7 @@ const TweetComponent = (props) => {
 									</div>
 								</div>
 							</div>
-							{(currentUser["id"] == tweet["user_id"] && props.is_tweet_delete == 1) &&
+							{(currentuser["id"] == tweet["user_id"] && props.is_tweet_delete == 1) &&
 								<button className="btn btn-sm btn-danger" onClick={delete_tweet}>ツイートを削除する</button>
 							}
 						</div>

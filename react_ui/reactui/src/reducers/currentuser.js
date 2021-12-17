@@ -4,7 +4,6 @@ const currentuser = (state={}, action) => {
 	//
 	switch(action.type){
 		case GET_CURRENT_USER_SUCCESS:
-			console.log(action.currentuser)
 			return action.currentuser
 		case GET_CURRENT_USER_FAIL:
 			return {}

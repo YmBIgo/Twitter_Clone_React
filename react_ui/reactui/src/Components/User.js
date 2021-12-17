@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom"
+import {useSelector} from "react-redux"
 
 import TweetComponent from "./TweetComponent"
 import UserComponent from "./UserComponent"
@@ -13,11 +14,12 @@ const User = () => {
 
 	const [user, setUser] = useState({});
 	const [tweets, setTweets] = useState([]);
-	const [currentuser, setCurrentuser] = useState({});
 	const [userIDFollow, setUserIDFollow] = useState([]);
 	const [userIDFollowing, setUserIDFollowing] = useState([]);
 	const query = useParams();
 	const useeffect_counter = 0;
+
+	const currentuser = useSelector(state => state.currentuser)
 
 	useEffect(() => {
 		getUser();
@@ -40,19 +42,6 @@ const User = () => {
 			}).then((response2) => {
 				console.log(response2["data"]["tweets"])
 				setTweets(response2["data"]["tweets"])
-			})
-			// current user
-			let user_signed_in_api_url = "http://localhost:3002/signed_in_user"
-			axios({
-				method: "GET",
-				url: user_signed_in_api_url,
-				withCredentials: true
-			}).then((response3) => {
-				if (response3["data"]["user"] != undefined){
-					setCurrentuser(response3["data"]["user"]);
-				} else {
-					setCurrentuser({"id": 0})
-				}
 			})
 		}
 	}

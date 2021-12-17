@@ -3,33 +3,18 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import {useSelector, useDispatch} from "react-redux"
 
+import {getCurrentUserData, getCurrentUser} from "../actions"
 import "./CSS/Tweets.css"
 
 const TweetNew = () => {
 
-	const [userSignedIn, setUserSignedIn] = useState(0);
-	const [currentuser, setCurrentuser] = useState({}); 
 	const useeffect_counter = 0
+	const dispatch = useDispatch()
+	const currentuser = useSelector(state => state.currentuser)
 
 	useEffect(() => {
-		checkUserSignedIn()
+		dispatch(getCurrentUserData())
 	}, [useeffect_counter]);
-
-	const checkUserSignedIn = () => {
-		axios({
-			method:"GET",
-			url: "http://localhost:3002/signed_in_user",
-			withCredentials: true
-		}).then((response) => {
-			if ( response["data"]["user"] == undefined ) {
-				setUserSignedIn(0)
-			} else {
-				setUserSignedIn(1)
-				setCurrentuser(response["data"]["user"]);
-			}
-			console.log(response)
-		})
-	}
 
 	const userLogin = (event) => {
 		let email = document.getElementsByClassName("email-input")[0].value
@@ -42,24 +27,18 @@ const TweetNew = () => {
 		}).then((response) => {
 			if ( response["data"]["changes"] == 1 ) {
 				fixHeader()
-				setUserSignedIn(1)
+				window.location.assign("/tweets/new")
 			}
 		})
 	}
 
 	const fixHeader = () => {
-		axios({
-			method: "GET",
-			url: "http://localhost:3002/signed_in_user",
-			withCredentials: true
-		}).then((response) => {
-			let avatar_image_url = response["data"]["user"]["avatar_image_url"]
-			let full_name = response["data"]["user"]["lastname"] + " " + response["data"]["user"]["firstname"] + "さん"
-			let header_li = document.getElementsByClassName("tweet-nav-link-title")[0]
-			let header_img = document.getElementsByClassName("tweet-nav-link-img")[0]
-			header_img.setAttribute("src", avatar_image_url)
-			header_li.innerText = full_name
-		})
+		let avatar_image_url = currentuser["avatar_image_url"]
+		let full_name = currentuser["lastname"] + " " + currentuser["firstname"] + "さん"
+		let header_li = document.getElementsByClassName("tweet-nav-link-title")[0]
+		let header_img = document.getElementsByClassName("tweet-nav-link-img")[0]
+		header_img.setAttribute("src", avatar_image_url)
+		header_li.innerText = full_name
 	}
 
 	const createTweet = (event) => {
@@ -78,7 +57,7 @@ const TweetNew = () => {
 
 	return(
 		<div>
-			{ userSignedIn == 0 &&
+			{ currentuser["id"] == undefined &&
 				<div>
 					<h4>ログインしてください</h4>
 					<div>
@@ -99,14 +78,14 @@ const TweetNew = () => {
 					</div>
 				</div>
 			}
-			{ userSignedIn == 1 &&
+			{ currentuser["id"] != undefined &&
 				<div>
 					<Link to="/tweets" className="btn">
 						ツイートタイムラインに戻る
 					</Link>
 					<div className="tweetcard">
 						<h4>
-							<Link to={"/users/"+currentuser["id"]}>
+							<Link to={"/users/" + currentuser["id"]}>
 								<img src={currentuser["avatar_image_url"]} className="user-avatar-img" />
 							</Link>
 							ツイート作成

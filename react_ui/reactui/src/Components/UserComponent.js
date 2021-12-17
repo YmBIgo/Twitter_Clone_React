@@ -2,13 +2,16 @@ import React, {useState, useEffect} from "react";
 import axios from "axios";
 import { Link } from "react-router-dom"
 
+import {useSelector} from "react-redux"
+
 const UserComponent = (props) => {
 
 	const [user, setUser] = useState({})
-	const [currentuser, setCurrentuser] = useState({});
 	const [userIDFollow, setUserIDFollow] = useState([]);
 	const [userIDFollowing, setUserIDFollowing] = useState([]);
 	const useeffect_counter = 0;
+
+	const currentuser = useSelector(state => state.currentuser)
 
 	useEffect(() => {
 		get_user_data()
@@ -22,22 +25,7 @@ const UserComponent = (props) => {
 		}).then((response) => {
 			// console.log(response["data"]["user"])
 			setUser(response["data"]["user"])
-			if ( user != undefined ){
-			// current user
-			let user_signed_in_api_url = "http://localhost:3002/signed_in_user"
-			axios({
-				method: "GET",
-				url: user_signed_in_api_url,
-				withCredentials: true
-			}).then((response2) => {
-				if (response2["data"]["user"] != undefined){
-					setCurrentuser(response2["data"]["user"]);
-				} else {
-					setCurrentuser({"id": 0})
-				}
-			})
 			followStatus()
-		}
 		})
 	}
 
@@ -111,7 +99,7 @@ const UserComponent = (props) => {
 					</Link>
 				</div>
 				<div className="col-4">
-					{ (currentuser["id"] != 0 && currentuser["id"] != user["id"]) &&
+					{ (currentuser["id"] != undefined && currentuser["id"] != user["id"]) &&
 						<div>
 						{ userIDFollow.includes(currentuser["id"]) == false &&
 							<input type="button" className="btn btn-info" value="Follow" onClick={followUser} />

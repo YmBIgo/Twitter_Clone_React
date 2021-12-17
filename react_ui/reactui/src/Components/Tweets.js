@@ -18,7 +18,6 @@ const Tweets = () => {
 	const useeffect_counter = 0;
 
 	useEffect(() => {
-		dispatch(getCurrentUserData());
 		dispatch(getTweet());
 		checkUserSignedIn();
 	}, [useeffect_counter])
