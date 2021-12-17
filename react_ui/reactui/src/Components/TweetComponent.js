@@ -28,7 +28,6 @@ const TweetComponent = (props) => {
 			method: "GET",
 			url: tweet_api_url
 		}).then((response) => {
-			console.log(response["data"]["tweet"])
 			setTweet(response["data"]["tweet"])
 			// ユーザー情報
 			let tweet_user_info_api_url = "";
@@ -74,7 +73,6 @@ const TweetComponent = (props) => {
 				} else {
 					setCurrentUser({"id":0})
 				}
-				console.log(response2["data"]["user"])
 				// いいね
 				let like_api_url = "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/like"
 				axios({
@@ -87,13 +85,11 @@ const TweetComponent = (props) => {
 						user_like.push(item["id"])
 					})
 					if ( user_like.includes(response2["data"]["user"]["id"]) == false ) {
-						console.log("hide like", user_like, currentUser["id"])
 						document.getElementsByClassName("like-section")[props.t_index].classList.add("hidden-like");
 						// document.getElementsByClassName("no-like-section")[0].classList.add("show-like");
 						document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length + "Likes";
 						document.getElementsByClassName("no-like-length")[props.t_index].innerText = user_like.length + "Likes";
 					} else if ( user_like.includes(response2["data"]["user"]["id"]) == true ) {
-						console.log("hide no like", user_like, currentUser["id"])
 						document.getElementsByClassName("no-like-section")[props.t_index].classList.add("hidden-like");
 						// document.getElementsByClassName("no-like-section")[0].classList.add("show-like");
 						document.getElementsByClassName("like-length")[props.t_index].innerText = user_like.length + "Likes";
@@ -106,7 +102,6 @@ const TweetComponent = (props) => {
 					url: "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/original_retweet"
 				}).then((response) => {
 					setRetweetID(response["data"]["lastID"])
-					// let retweet_api_url = "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/retweet"
 					let retweet_api_url = "http://localhost:3002/tweets/" + response["data"]["lastID"] + "/retweet"
 					axios({
 						method: "GET",
@@ -115,6 +110,7 @@ const TweetComponent = (props) => {
 						let retweet_array = response4["data"]["retweets"]
 						document.getElementsByClassName("retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
 						document.getElementsByClassName("no-retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
+						// いい書き方がないか ...
 						if (retweet_array.length == 0) {
 							document.getElementsByClassName("retweet-content")[props.t_index].classList.add("hidden-retweet")
 						} else {

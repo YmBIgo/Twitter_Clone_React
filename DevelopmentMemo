@@ -37,3 +37,6 @@
 	@ express_tweet_db.js
 	like 取得が、ユーザー全取得になっていてデータが増えると時間がかかる。配列だけ取得できる API の URL を開けておくなり、改善の余地があるところ。
 
+・Retweet の API設計
+	自身が Retweet したかを確認するのに、現状の Retweet API の ID だけでは不十分。
+
