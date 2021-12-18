@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import {useSelector, useDispatch} from "react-redux"
+
+import {getCurrentUser} from "../actions/"
 import "./CSS/UserEdit.css";
 import "./CSS/Users.css"
 
 const UserEdit = () => {
 
 	const [userSignedIn, setUserSignedIn] = useState(0);
-	const [user, setUser] = useState({lastname: "", firstname: "", description: ""});
 	const [lastname, setLastname] = useState("");
 	const [firstname, setFirstname] = useState("");
 	const [description, setDescription] = useState("");
+
+	const currentuser = useSelector(state => state.currentuser)
+	const dispatch = useDispatch()
 
 	const useeffect_counter = 0
 
@@ -18,23 +23,12 @@ const UserEdit = () => {
 	}, [useeffect_counter]);
 
 	const checkUserSignedIn = () => {
-		axios({
-			method:"GET",
-			url: "http://localhost:3002/signed_in_user",
-			withCredentials: true
-		}).then((response) => {
-			if ( response["data"]["user"] == undefined ) {
-				setUserSignedIn(0)
-			} else {
-				setUserSignedIn(1)
-				setUser(response["data"]["user"]);
-				// 書き方がビミョウ
-				setLastname(response["data"]["user"]["lastname"])
-				setFirstname(response["data"]["user"]["firstname"])
-				setDescription(response["data"]["user"]["description"])
-			}
-			console.log(response)
-		})
+		if ( currentuser["id"] != undefined ) {
+			// 書き方がビミョウ
+			setLastname(currentuser["lastname"])
+			setFirstname(currentuser["firstname"])
+			setDescription(currentuser["description"])
+		}
 	}
 
 	const userLogin = (event) => {
@@ -47,7 +41,8 @@ const UserEdit = () => {
 			withCredentials: true
 		}).then((response) => {
 			if ( response["data"]["changes"] == 1 ) {
-				setUserSignedIn(1)
+				dispatch(getCurrentUser())
+				window.location.assign("/")
 			}
 		})
 	}
@@ -59,7 +54,6 @@ const UserEdit = () => {
 		setLastname(inputted_lastname)
 		setFirstname(inputted_firstname)
 		setDescription(inputted_description);
-
 	}
 
 	const updateUserData = (event) => {
@@ -67,7 +61,7 @@ const UserEdit = () => {
 		let fixed_lastname = document.getElementsByClassName("lastname-input")[0].value;
 		let fixed_firstname = document.getElementsByClassName("firstname-input")[0].value;
 		let fixed_description = document.getElementsByClassName("description-input")[0].value;
-		let user_update_url = "http://localhost:3002/users/update/" + user["id"]
+		let user_update_url = "http://localhost:3002/users/update/" + currentuser["id"]
 		axios({
 			method: "POST",
 			url: user_update_url,
@@ -75,13 +69,13 @@ const UserEdit = () => {
 			withCredentials: true
 		}).then((response) => {
 			console.log(response)
-			window.location.assign("http://localhost:3000/users/" + user["id"])
+			window.location.assign("http://localhost:3000/users/" + currentuser["id"])
 		})
 	}
 
 	return (
 		<div>
-			{ userSignedIn == 0 &&
+			{ currentuser["id"] == undefined &&
 				<div>
 					<h4>ログインしてください</h4>
 					<div>
@@ -98,14 +92,14 @@ const UserEdit = () => {
 					</div>
 				</div>
 			}
-			{ userSignedIn == 1 &&
+			{ currentuser["id"] != undefined &&
 				<div>
 					<br />
 					<div className="users-info-card">
 						<h4>ユーザー画像を編集する</h4>
-						{// なんかビミョウ
-						}
-						<form action={'http://localhost:3002/users/upload_image/'+user.id} method="POST" enctype="multipart/form-data">
+						{/* なんかビミョウ
+						*/}
+						<form action={'http://localhost:3002/users/upload_image/'+currentuser.id} method="POST" enctype="multipart/form-data">
 							<input className="avatar-input" type="file" name="avatar" accept="image/*" />
 							<br />
 							<button className="btn btn-success" >Send</button>

@@ -1,6 +1,9 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
 import { Link } from "react-router-dom"
+import {useSelector, useDispatch} from "react-redux"
+
+import {getCurrentUser} from "../actions"
 import "./CSS/Users.css"
 
 const UserCreate = () => {
@@ -8,23 +11,17 @@ const UserCreate = () => {
 	const useeffect_counter = 0
 	const [userSignedIn, setUserSignedIn] = useState(0)
 
+	const dispatch = useDispatch()
+	const currentuser = useSelector(state => state.currentuser)
+
 	useEffect(() => {
 		checkUserSignIn()
 	}, [useeffect_counter])
 
 	const checkUserSignIn = () => {
-		axios({
-			method: "GET",
-			url: "http://localhost:3002/signed_in_user",
-			withCredentials: true
-		}).then((response) => {
-			if ( response["data"]["user"] != undefined ) {
-				setUserSignedIn(1)
-				window.location.assign("http://localhost:3000")
-			} else {
-				setUserSignedIn(0)
-			}
-		})
+		if ( currentuser["id"] != undefined ) {
+			window.location.assign("http://localhost:3000")
+		}
 	}
 
 	const createUser = () => {
@@ -45,6 +42,7 @@ const UserCreate = () => {
 		}).then((response) => {
 			console.log(response["data"])
 			if ( response["data"]["lastID"] != undefined ){
+				dispatch(getCurrentUser())
 				window.location.assign("/")
 			}
 		})
