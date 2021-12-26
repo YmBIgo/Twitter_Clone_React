@@ -1,10 +1,14 @@
 import axios from "axios"
 
+// Get Tweets
 export const GET_TWEET_SUCCESS = "GET_TWEET_SUCCESS"
 export const GET_TWEET_FAIL = "GET_TWEET_FAIL"
+// Get Current User
 export const GET_CURRENT_USER_SUCCESS = "GET_CURRENT_USER_SUCCESS"
 export const GET_CURRENT_USER_FAIL = "GET_CURRENT_USER_FAIL"
 export const GET_CURRENT_USER_DATA = "GET_CURRENT_USER_DATA"
+// Search Modal Page
+export const CHANGE_SEARCH_MODAL_PAGE = "CHANGE_SEARCH_MODAL_PAGE"
 
 // Tweets
 export const getTweet = () => {
@@ -86,3 +90,12 @@ export const getCurrentUserData = () => {
 		type: GET_CURRENT_USER_DATA
 	}
 }
+
+// Search Modal
+export const ChangeSearchModalPage = (page_id) => {
+	return {
+		type: CHANGE_SEARCH_MODAL_PAGE,
+		page_id: page_id
+	}
+}
+

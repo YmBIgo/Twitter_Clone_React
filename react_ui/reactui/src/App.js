@@ -5,6 +5,7 @@ import {useState, useEffect} from "react";
 import axios from "axios";
 import {useDispatch, useSelector} from "react-redux"
 
+// Basic Functions
 import Users from "./Components/Users"
 import User from "./Components/User"
 import UserEdit from "./Components/UserEdit"
@@ -14,8 +15,13 @@ import Tweet from "./Components/Tweet"
 import TweetNew from "./Components/TweetNew"
 import Follow from "./Components/Follow"
 import Following from "./Components/Following"
-
+// Modal
+import SearchModal from "./Components/modal/search/SearchModal"
+// Actions
 import {getCurrentUser} from "./actions"
+
+// CSS
+import "./Components/CSS/Header.css"
 
 function App() {
 
@@ -49,6 +55,7 @@ function App() {
           </Routes>
         </div>
       </div>
+      <SearchModal />
     </BrowserRouter>
   );
 }
@@ -74,6 +81,11 @@ const Header = () => {
         setCurrentuser({"id": 0, "avatar_image_url": "https://storage.googleapis.com/tweet_storage_0218/default/twitter.png"})
       }
     })
+  }
+
+  const DisplaySearchModal = () => {
+    let searchModal = document.getElementsByClassName("search-modal")[0]
+    searchModal.style.display = "block"
   }
 
   const userLogout = () => {
@@ -110,6 +122,12 @@ const Header = () => {
         </li>
         <li>
           <Link to="/tweets/new" className="tweet-nav-link">ツイート作成</Link>
+        </li>
+        <li>
+          <a className="tweet-nav-link"
+              onClick={(e) => DisplaySearchModal(e)}>
+              検索モーダル
+          </a>
         </li>
         { currentuser["id"] != 0 &&
           <li>

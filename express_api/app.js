@@ -5,6 +5,7 @@ const tweet_db = require("./lib/express_tweet_db");
 const fs = require("fs");
 const multer = require("multer");
 const google_cs = require("./lib/gcp_cloud_storage")
+const got = require("got")
 
 const cookieParser = require("cookie-parser");
 const crypto = require("crypto")
@@ -303,4 +304,40 @@ app.get("/tweets/:id/like", cors(corsOptions), (req, res) => {
 	let tweet_id = req.params.id
 	tweet_db.select_all_likes(db, tweet_id, res)
 })
+
+// Search
+app.get('/search/:keyword', cors(corsOptions), (req, res) => {
+	let gcp_api_key = process.env.GCP_API_KEY;
+	let keyword = req.params.keyword
+	keyword 	= keyword.replace(/\'/gi, "");
+	let gcp_request_url = "https://www.googleapis.com/customsearch/v1?key=" + gcp_api_key + "&cx=51356a11eee1142c3&q=" + keyword
+	let response_result;
+	(async() => {
+		try {
+			let response = await got(gcp_request_url)
+			response_result = response.body
+		} catch(error) {
+			console.log(error)
+		}
+	})()
+	.then(function(){
+		res.send({search_result: response_result})
+	})
+})
+app.get("/page_url", cors(corsOptions), (req, res) => {
+	let url = req.query.url;
+	let response_result;
+	(async() => {
+		try{
+			let response = await got(url)
+			response_result = response.body
+		} catch(error) {
+			console.log(error)
+		}
+	})()
+	.then(function(){
+		res.send({html_content: response_result})
+	})
+})
+
 
