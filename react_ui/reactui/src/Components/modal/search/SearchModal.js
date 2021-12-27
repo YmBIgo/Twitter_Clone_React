@@ -2,6 +2,7 @@ import React, {useState} from "react"
 import axios from "axios"
 import {useDispatch, useSelector} from "react-redux"
 
+import SearchModalPage1 from "./SearchModalPage1"
 import {ChangeSearchModalPage} from "../../../actions"
 import "../../CSS/Modal.css"
 import {analyzeURL} from "../../../lib/get_code_snippet"
@@ -153,19 +154,10 @@ const SearchModal = () => {
 		<div className="search-modal">
 			<div className="search-modal-content">
 				{searchPage === 0 &&
-					<div className="search-modal-content-page1">
-						<div className="search-modal-content-page1-close-button"
-							 onClick={(e) => closeSearchModal(e)}>
-							x
-						</div>
-						<h2 className="text-center search-modal-content-page1-title">検索する</h2>
-						<input type="text" className="form-control search-modal-content-page1-input" />
-						<button className="btn btn-primary search-modal-content-page1-button"
-								onClick={(e) => searchToPage2(e)}
-						>
-							検索する
-						</button>
-					</div>
+					<SearchModalPage1
+						closeSearchModal={closeSearchModal}
+						searchToPage2={searchToPage2}
+					/>
 				}
 				{ searchPage === 1 &&
 					<div className="search-modal-content-page2">
@@ -254,15 +246,15 @@ const SearchModal = () => {
 										}
 										{ index === 0 &&
 											<div className="row">
-												<div className="col-4"
+												<div className="col-2"
 													 onClick={(e) => codeSnippetPrev(e)}>
 													 ＜
 												</div>
-												<div className="col-4"
+												<div className="col-8 text-center"
 													 onClick={(e) => getCodeSnippet(e, result["link"])}>
 													<small>コードスニペット取得</small>
 												</div>
-												<div className="col-4"
+												<div className="col-2"
 													 onClick={(e) => codeSnippetNext(e)}>
 													 ＞
 												</div>
@@ -270,15 +262,15 @@ const SearchModal = () => {
 										}
 										{ index === 1 &&
 											<div className="row">
-												<div className="col-4"
+												<div className="col-2"
 													 onClick={(e) => codeSnippet2Prev(e)}>
 													 ＜
 												</div>
-												<div className="col-4"
+												<div className="col-8 text-center"
 													 onClick={(e) => getCodeSnippet2(e, result["link"])}>
 													<small>コードスニペット取得</small>
 												</div>
-												<div className="col-4"
+												<div className="col-2"
 													 onClick={(e) => codeSnippet2Next(e)}>
 													 ＞
 												</div>
