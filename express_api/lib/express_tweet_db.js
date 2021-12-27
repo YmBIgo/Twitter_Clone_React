@@ -477,6 +477,33 @@ function select_user_tweets(db, user_id, res){
 	})
 }
 
+function select_users_id_from_tweets(db, tweet_array, res){
+	if (Array.isArray(tweet_array) != true) {
+		res.status(400).json({
+			"status": "input error",
+			"message": "input must be Array."
+		})
+	} else {
+		let tweet_array_in = "";
+		tweet_array.forEach(function(item){
+			tweet_array_in += item + ","
+		})
+		tweet_array_in = tweet_array.slice(0, tweet_array_in.length-1)
+		let user_id_state = "SELECT USER_ID FROM TWEETS WHERE ID IN (" + tweet_array_in + ");"
+		db.all(user_id_state, (err, results) => {
+			if (err) {
+				console.log(err)
+				return_error(err);
+			} else {
+				res.status(200).json({
+					"status": "ok",
+					"user_id": results
+				})
+			}
+		})
+	}
+}
+
 function create_tweet(db, tweet_data, user_data, res){
 	// cookie 認証必要
 	db.serialize(() => {
@@ -1081,6 +1108,7 @@ module.exports.select_id_tweet = select_id_tweet
 module.exports.create_tweet = create_tweet;
 module.exports.delete_tweet = delete_tweet;
 module.exports.get_tweets_from_user_id = get_tweets_from_user_id;
+module.exports.select_users_id_from_tweets = select_users_id_from_tweets;
 // Tweets Reply
 module.exports.create_reply = create_reply;
 module.exports.select_tweet_reply = select_tweet_reply;

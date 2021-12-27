@@ -212,6 +212,16 @@ app.get("/users/:id/tweets", cors(corsOptions), (req, res) => {
 	let user_id = req.params.id
 	tweet_db.select_user_tweets(db, user_id, res)
 })
+app.get("/tweets_users", cors(corsOptions), (req, res) => {
+	let tweet_ids_json = req.query.tweet_ids;
+	let tweet_ids;
+	try{
+		tweet_ids = JSON.parse(tweet_ids_json);
+	} catch(e) {
+		tweet_ids = [0]
+	}
+	tweet_db.select_users_id_from_tweets(db, tweet_ids, res)
+})
 
 // Reply
 app.post("/reply", cors(corsOptions), (req, res) => {

@@ -212,6 +212,7 @@ const SearchModal = () => {
 							x
 						</div>
 						<hr />
+						<p>「{keyword}」の 検索結果</p>
 						<a  className="btn btn-primary"
 							onClick={(e) => backToPage2(e)}>
 							１０件検索を表示する

@@ -103,11 +103,21 @@ const TweetComponent = (props) => {
 					document.getElementsByClassName("retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
 					document.getElementsByClassName("no-retweet-length")[props.t_index].innerText = retweet_array.length + " Retweets"
 					// いい書き方がないか ...
-					if (retweet_array.length == 0) {
-						document.getElementsByClassName("retweet-content")[props.t_index].classList.add("hidden-retweet")
-					} else {
-						document.getElementsByClassName("no-retweet-content")[props.t_index].classList.add("hidden-retweet")
-					}
+					let tweet_users_url = "http://localhost:3002/tweets_users?tweet_ids=" + JSON.stringify(retweet_array)
+					let user_array = []
+					axios({
+						method: "GET",
+						url: tweet_users_url
+					}).then((response) => {
+						response["data"]["user_id"].forEach(function(item){
+							user_array.push(item["user_id"])
+						})
+						if (user_array.includes(currentuser["id"]) == false) {
+							document.getElementsByClassName("retweet-content")[props.t_index].classList.add("hidden-retweet")
+						} else {
+							document.getElementsByClassName("no-retweet-content")[props.t_index].classList.add("hidden-retweet")
+						}
+					})
 				})
 			})
 			// Reply
