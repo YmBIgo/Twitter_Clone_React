@@ -26,9 +26,6 @@ const Tweets = () => {
 	const [paginationPos, setPaginationPos] = useState(0)
 	const paginationPosRef = useRef(paginationPos)
 	paginationPosRef.current = paginationPos
-	const [firstPaginationPos, setFirstPaginationPos] = useState(0)
-	const firstPaginationPosRef = useRef(firstPaginationPos)
-	firstPaginationPosRef.current = firstPaginationPos
 	// 
 	const [isScroll, setIsScroll] = useState(true)
 
@@ -86,7 +83,7 @@ const Tweets = () => {
 	}
 
 	const initializePagination = () => {
-		getPaginationPos()
+		getAndSetPaginationPos()
 		var tweets_timeline_area = document.getElementsByClassName("tweet-timeline")[0]
 		window.addEventListener('scroll', onScrollPagination)
 	}
@@ -99,16 +96,16 @@ const Tweets = () => {
 			var tweets_timeline_area = document.getElementsByClassName("tweet-timeline")[0]
 			window.removeEventListener('scroll', onScrollPagination)
 			// 300 って何？
-			setPaginationPos(paginationPosRef.current + firstPaginationPosRef.current - 300)
+			// setPaginationPos(paginationPosRef.current + firstPaginationPosRef.current - 300)
+			getAndSetPaginationPos()
 			console.log(paginationPosRef.current, offsetRef.current)
 			window.addEventListener('scroll', onScrollPagination)
 		}
 	}
 
-	const getPaginationPos = () => {
+	const getAndSetPaginationPos = () => {
 		var pagination_area = document.getElementsByClassName("tweet_pagination_area")[0]
 		setPaginationPos(pagination_area.offsetTop)
-		setFirstPaginationPos(pagination_area.offsetTop)
 	}
 
 	return (
