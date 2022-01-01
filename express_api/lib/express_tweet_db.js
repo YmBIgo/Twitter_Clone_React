@@ -339,7 +339,7 @@ function create_tweet_table(db) {
 		});
 }
 
-function select_all_tweet(db, user_data, res) {
+function select_all_tweet(db, user_data, offset, res) {
 	// cookie 認証必要
 	db.serialize(() => {
 		db.get("SELECT * FROM USERS WHERE cookietext = ? AND email = ?", user_data["cookietext"], user_data["email"], (err, row) => {
@@ -349,11 +349,12 @@ function select_all_tweet(db, user_data, res) {
 				if (row != undefined){
 					db.all("SELECT * FROM USER_FOLLOW_RELATIONS WHERE from_user_id = ?", row["id"], (err, ufr_rows) => {
 						console.log(ufr_rows)
+						let offset_num = (offset-1) * 10
 						if (err) {
 							console.log(err)
 							return_error(err, res)
 						} else if (ufr_rows == undefined) {
-							db.all("SELECT * FROM TWEETS WHERE user_id = ? AND is_reply = 0 ORDER BY created_at DESC;", row["id"], (err, rows) => {
+							db.all("SELECT * FROM TWEETS WHERE user_id = ? AND is_reply = 0 ORDER BY created_at DESC LIMIT 10 OFFSET ?;", row["id"], offset_num, (err, rows) => {
 								if (err) {
 									console.log(err)
 									return_error(err, res)
@@ -381,10 +382,11 @@ function select_all_tweet(db, user_data, res) {
 							ufr_rows.forEach(function(ufr_row){
 								sql_where_ufr_id += ufr_row["to_user_id"] + ","
 							})
+							let offset_num = (offset-1) * 10
 							sql_where_ufr_id = sql_where_ufr_id.slice(0, sql_where_ufr_id.length-1)
-							let select_tweets_where_ufr_state = "SELECT * FROM TWEETS WHERE user_id in (" + sql_where_ufr_id + ") AND is_reply = 0 ORDER BY created_at DESC;"
+							let select_tweets_where_ufr_state = "SELECT * FROM TWEETS WHERE user_id in (" + sql_where_ufr_id + ") AND is_reply = 0 ORDER BY created_at DESC LIMIT 10 OFFSET ?;"
 							console.log(select_tweets_where_ufr_state)
-							db.all(select_tweets_where_ufr_state, (err, rows) => {
+							db.all(select_tweets_where_ufr_state, offset_num, (err, rows) => {
 								if (err) {
 									console.log(err)
 									return_error(err, res)

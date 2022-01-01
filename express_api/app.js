@@ -183,7 +183,14 @@ app.get("/tweets", cors(corsOptions), (req, res) => {
 		"email": req.cookies["email"],
 		"cookietext": req.cookies["cookietext"]
 	}
-	tweet_db.select_all_tweet(db, user_data, res)
+	let offset = req.query.offset
+	if (offset == undefined) {
+		offset = 1
+	} else {
+		offset = parseInt(offset)
+	}
+	console.log("Offset ", offset)
+	tweet_db.select_all_tweet(db, user_data, offset, res)
 })
 app.get("/tweets/:id", cors(corsOptions), (req, res) => {
 	let tweet_id = req.params.id

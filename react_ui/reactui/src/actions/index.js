@@ -3,6 +3,9 @@ import axios from "axios"
 // Get Tweets
 export const GET_TWEET_SUCCESS = "GET_TWEET_SUCCESS"
 export const GET_TWEET_FAIL = "GET_TWEET_FAIL"
+// Concat Tweets
+export const CONCAT_TWEET_SUCCESS = "CONCAT_TWEET_SUCCESS"
+export const CONCAT_TWEET_FAIL = "CONCAT_TWEET_FAIL"
 // Get Current User
 export const GET_CURRENT_USER_SUCCESS = "GET_CURRENT_USER_SUCCESS"
 export const GET_CURRENT_USER_FAIL = "GET_CURRENT_USER_FAIL"
@@ -37,6 +40,31 @@ export const getTweet = () => {
 	}
 }
 
+export const concatTweet = (offset) => {
+	return (dispatch) => {
+		axios({
+			method: "GET",
+			url: "http://localhost:3002/tweets?offset=" + offset.toString(),
+			withCredentials: true
+		}).then((response) => {
+			let res_status = response["data"]["status"]
+			if (res_status === "ok"){
+					// tweets 取得 dispatch
+				let res_tweets = response["data"]["tweets"]
+				dispatch(concatTweetSuccess(res_tweets))
+			} else if (res_status === "authentification error"){
+				dispatch(concatTweetFail("auth error"))
+			} else if (res_status === "error") {
+				dispatch(concatTweetFail("error"))
+			} else {
+				//
+			}
+		}).catch((err) => {
+			dispatch(concatTweetFail(err))
+		})
+	}
+}
+
 const getTweetSuccess = tweets => {
 	return {
 		type: GET_TWEET_SUCCESS,
@@ -48,6 +76,20 @@ const getTweetFail = (error) => {
 	return {
 		type: GET_TWEET_FAIL,
 		error: error,
+	}
+}
+
+const concatTweetSuccess = tweets => {
+	return {
+		type: CONCAT_TWEET_SUCCESS,
+		tweets: tweets
+	}
+}
+
+const concatTweetFail = tweets => {
+	return {
+		type: CONCAT_TWEET_FAIL,
+		tweets: tweets
 	}
 }
 

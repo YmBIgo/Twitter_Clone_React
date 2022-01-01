@@ -5,7 +5,8 @@ import {useSelector, useDispatch} from "react-redux"
 
 import TweetComponent from "./TweetComponent"
 import UserComponent from "./UserComponent"
-import {getTweet, getCurrentUserData, getCurrentUser} from "../actions"
+import {getTweet, concatTweet,
+		getCurrentUserData, getCurrentUser} from "../actions"
 import "./CSS/Tweets.css"
 import heart_dark from "./IMG/heart_dark.svg"
 import heart_normal from "./IMG/heart_normal.jpg"
@@ -16,6 +17,7 @@ const Tweets = () => {
 	const tweets = useSelector(state => state.tweets)
 	const currentuser = useSelector(state => state.currentuser)
 	const useeffect_counter = 0;
+	const [offset, setOffset] = useState(1)
 
 	useEffect(() => {
 		dispatch(getTweet());
@@ -63,6 +65,12 @@ const Tweets = () => {
 		})
 	}
 
+	const addTweet = () => {
+		dispatch(concatTweet(offset))
+		let next_offset = offset + 1
+		setOffset(next_offset)
+	}
+
 	return (
 		<div>
 			{/* 酷い書き方 */}
@@ -101,6 +109,12 @@ const Tweets = () => {
 										<TweetComponent tweet_id={tweet.id} t_index={index} is_timeline="1" />
 									)
 								})}
+							</div>
+							<div style={{marginLeft:"190px"}}>
+								<button
+									onClick={() => addTweet()}>
+									もっと見る
+								</button>
 							</div>
 						</>
 					}
