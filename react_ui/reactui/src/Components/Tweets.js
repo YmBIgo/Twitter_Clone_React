@@ -22,6 +22,7 @@ const Tweets = () => {
 	useEffect(() => {
 		dispatch(getTweet());
 		checkUserSignedIn();
+		initializePagination();
 	}, [useeffect_counter])
 
 	const checkUserSignedIn = () => {
@@ -71,6 +72,12 @@ const Tweets = () => {
 		setOffset(next_offset)
 	}
 
+	const initializePagination = () => {
+		let pagination_area = document.getElementsByClassName("tweet_pagination_area")[0]
+		console.log(pagination_area.top)
+		let tweets_timeline_area = document.getElementsByClassName("tweet-timeline")[0]
+	}
+
 	return (
 		<div>
 			{/* 酷い書き方 */}
@@ -103,14 +110,15 @@ const Tweets = () => {
 							<h4 className="tweet-page-title">
 								ツイートタイムライン
 							</h4>
-							<div>
+							<div className="tweet-timeline">
 								{tweets.map((tweet, index) => {
 									return(
 										<TweetComponent tweet_id={tweet.id} t_index={index} is_timeline="1" />
 									)
 								})}
 							</div>
-							<div style={{marginLeft:"190px"}}>
+							<div className="tweet_pagination_area"
+								 style={{marginLeft:"190px"}}>
 								<button
 									onClick={() => addTweet()}>
 									もっと見る
