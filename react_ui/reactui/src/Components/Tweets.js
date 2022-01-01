@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from 'react-router-dom';
 import axios from "axios";
 import {useSelector, useDispatch} from "react-redux"
@@ -16,13 +16,26 @@ const Tweets = () => {
 	const dispatch = useDispatch()
 	const tweets = useSelector(state => state.tweets)
 	const currentuser = useSelector(state => state.currentuser)
+	// 
 	const useeffect_counter = 0;
+	// 
 	const [offset, setOffset] = useState(1)
+	const offsetRef = useRef(offset)
+	offsetRef.current = offset
+	// 
+	const [paginationPos, setPaginationPos] = useState(0)
+	const paginationPosRef = useRef(paginationPos)
+	paginationPosRef.current = paginationPos
+	const [firstPaginationPos, setFirstPaginationPos] = useState(0)
+	const firstPaginationPosRef = useRef(firstPaginationPos)
+	firstPaginationPosRef.current = firstPaginationPos
+	// 
+	const [isScroll, setIsScroll] = useState(true)
 
 	useEffect(() => {
 		dispatch(getTweet());
 		checkUserSignedIn();
-		initializePagination();
+		window.setTimeout(initializePagination, 1000); /* 書き方... */
 	}, [useeffect_counter])
 
 	const checkUserSignedIn = () => {
@@ -67,15 +80,35 @@ const Tweets = () => {
 	}
 
 	const addTweet = () => {
-		dispatch(concatTweet(offset))
-		let next_offset = offset + 1
+		dispatch(concatTweet(offsetRef.current))
+		let next_offset = offsetRef.current + 1
 		setOffset(next_offset)
 	}
 
 	const initializePagination = () => {
-		let pagination_area = document.getElementsByClassName("tweet_pagination_area")[0]
-		console.log(pagination_area.top)
-		let tweets_timeline_area = document.getElementsByClassName("tweet-timeline")[0]
+		getPaginationPos()
+		var tweets_timeline_area = document.getElementsByClassName("tweet-timeline")[0]
+		window.addEventListener('scroll', onScrollPagination)
+	}
+
+	const onScrollPagination = (e) => {
+		// console.log(window.scrollY + window.innerHeight, paginationPosRef.current)
+		if (window.scrollY + window.innerHeight > paginationPosRef.current ) {
+			// setIsScroll(false)
+			addTweet()
+			var tweets_timeline_area = document.getElementsByClassName("tweet-timeline")[0]
+			window.removeEventListener('scroll', onScrollPagination)
+			// 300 って何？
+			setPaginationPos(paginationPosRef.current + firstPaginationPosRef.current - 300)
+			console.log(paginationPosRef.current, offsetRef.current)
+			window.addEventListener('scroll', onScrollPagination)
+		}
+	}
+
+	const getPaginationPos = () => {
+		var pagination_area = document.getElementsByClassName("tweet_pagination_area")[0]
+		setPaginationPos(pagination_area.offsetTop)
+		setFirstPaginationPos(pagination_area.offsetTop)
 	}
 
 	return (

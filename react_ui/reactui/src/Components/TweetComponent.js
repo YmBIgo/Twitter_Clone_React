@@ -63,7 +63,7 @@ const TweetComponent = (props) => {
 						setUser(response1["data"]["user"]);
 					})
 				})
-				console.log(tweet_user_info_api_url)
+				// console.log(tweet_user_info_api_url)
 			}
 			// いいね
 			let like_api_url = "http://localhost:3002/tweets/" + response["data"]["tweet"]["id"] + "/like"
